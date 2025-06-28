@@ -1,11 +1,9 @@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Calendar, MapPin, Search, Bell, Globe, Users } from "lucide-react"
-import Link from "next/link"
+import { Calendar, MapPin } from "lucide-react"
 import Image from "next/image"
-import { WalletConnect } from "@/components/wallet-connect"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { Navbar } from "@/components/navbar"
 
 export default function HomePage() {
   const events = [
@@ -70,51 +68,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-8">
-              <Link href="/" className="flex items-center space-x-2.5">
-                <div className="w-7 h-7 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-sm">yL</span>
-                </div>
-                <span className="text-xl font-display text-foreground">yLori</span>
-              </Link>
-              <div className="hidden md:flex items-center space-x-1">
-                <Link href="#" className="text-foreground font-medium flex items-center space-x-2.5 px-4 py-2 rounded-lg bg-accent/60 border border-border/50">
-                  <Calendar className="w-4 h-4" />
-                  <span>Events</span>
-                </Link>
-                <Link href="#" className="text-muted-foreground hover:text-foreground flex items-center space-x-2.5 px-4 py-2 rounded-lg hover:bg-accent/40 transition-all">
-                  <Calendar className="w-4 h-4" />
-                  <span>Calendars</span>
-                </Link>
-                <Link href="#" className="text-muted-foreground hover:text-foreground flex items-center space-x-2.5 px-4 py-2 rounded-lg hover:bg-accent/40 transition-all">
-                  <Globe className="w-4 h-4" />
-                  <span>Discover</span>
-                </Link>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <span className="text-sm text-muted-foreground hidden lg:block font-mono font-medium">
-                11:05 pm IST
-              </span>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 shadow-lg">
-                Create Event
-              </Button>
-              <Button variant="ghost" size="sm" className="w-9 h-9 p-0 hover:bg-accent/60">
-                <Search className="w-4 h-4" />
-              </Button>
-              <Button variant="ghost" size="sm" className="relative w-9 h-9 p-0 hover:bg-accent/60">
-                <Bell className="w-4 h-4" />
-                <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 rounded-full border-2 border-background"></span>
-              </Button>
-              <ThemeToggle />
-              <WalletConnect />
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       <div className="max-w-6xl mx-auto px-6 py-12">
         {/* Header */}
