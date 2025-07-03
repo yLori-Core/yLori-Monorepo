@@ -58,8 +58,11 @@ export async function Navbar() {
             
             <Button 
               className="bg-foreground hover:bg-foreground/90 text-background font-medium px-4 py-2 h-9 text-sm shadow-sm"
+              asChild
             >
-              Create Event
+              <Link href="/create">
+                Create Event
+              </Link>
             </Button>
             
             <Button variant="ghost" size="sm" className="w-9 h-9 p-0 hover:bg-accent/60 text-muted-foreground hover:text-foreground">
@@ -96,9 +99,14 @@ export async function Navbar() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    Profile
+                  <DropdownMenuItem asChild>
+                    <Link 
+                      href={`/user/${(session.user as any).username || 'profile'}`}
+                      className="flex items-center w-full hover:bg-accent focus:bg-accent text-foreground hover:text-foreground"
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <SignOutButton />

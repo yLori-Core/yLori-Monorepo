@@ -1,10 +1,6 @@
 import { Navbar } from "@/components/navbar"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { EventNameTextarea } from "@/components/event-name-textarea"
-import { ClientDateTimePicker } from "@/components/client-date-time-picker"
+import { EventForm } from "@/components/event-form"
 import { 
   Select, 
   SelectContent, 
@@ -15,14 +11,7 @@ import {
 import { 
   Camera, 
   ChevronDown, 
-  MapPin, 
-  Calendar, 
-  Clock, 
-  Users, 
-  Ticket, 
   Globe,
-  UserCheck,
-  Edit3,
   Shuffle
 } from "lucide-react"
 import { getServerSession } from "next-auth/next"
@@ -102,90 +91,20 @@ export default async function CreateEventPage() {
                   <div className="w-6 h-6 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/40 dark:to-pink-900/40 rounded border border-border"></div>
                   <span className="text-sm font-medium text-foreground">Theme</span>
                 </div>
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                <div className="text-muted-foreground hover:text-foreground">
                   <Shuffle className="w-4 h-4" />
-                </Button>
+                </div>
               </div>
-              <Button variant="outline" className="w-full justify-between border-border">
+              <div className="w-full justify-between border border-border rounded-md p-3">
                 <span className="text-sm">Minimal</span>
-                <ChevronDown className="w-4 h-4" />
-              </Button>
+                <ChevronDown className="w-4 h-4 float-right" />
+              </div>
             </div>
           </div>
 
           {/* Right Column - Form */}
           <div className="space-y-6">
-                         {/* Event Name */}
-             <div>
-               <EventNameTextarea />
-             </div>
-
-            {/* Date & Time */}
-            <ClientDateTimePicker />
-
-            {/* Location */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer">
-                <MapPin className="w-5 h-5 text-muted-foreground" />
-                <div>
-                  <div className="font-medium text-foreground">Add Event Location</div>
-                  <div className="text-sm text-muted-foreground">Offline location or virtual link</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Description */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer">
-                <Edit3 className="w-5 h-5 text-muted-foreground" />
-                <span className="font-medium text-foreground">Add Description</span>
-              </div>
-            </div>
-
-            {/* Event Options */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-foreground">Event Options</h3>
-              
-              {/* Tickets */}
-              <div className="flex items-center justify-between p-4 border border-border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Ticket className="w-5 h-5 text-muted-foreground" />
-                  <span className="font-medium text-foreground">Tickets</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-green-600">Free</span>
-                  <Edit3 className="w-4 h-4 text-muted-foreground" />
-                </div>
-              </div>
-
-              {/* Require Approval */}
-              <div className="flex items-center justify-between p-4 border border-border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <UserCheck className="w-5 h-5 text-muted-foreground" />
-                  <span className="font-medium text-foreground">Require Approval</span>
-                </div>
-                <div className="w-11 h-6 bg-blue-600 rounded-full relative">
-                  <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 right-0.5 transition-transform"></div>
-                </div>
-              </div>
-
-              {/* Capacity */}
-              <div className="flex items-center justify-between p-4 border border-border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Users className="w-5 h-5 text-muted-foreground" />
-                  <span className="font-medium text-foreground">Capacity</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-foreground">Unlimited</span>
-                  <Edit3 className="w-4 h-4 text-muted-foreground" />
-                </div>
-              </div>
-            </div>
-
-            {/* Create Button */}
-            <Button className="w-full bg-foreground hover:bg-foreground/90 text-background font-medium py-3 h-auto rounded-xl text-base">
-              Create Event
-            </Button>
+            <EventForm initialData={{ visibility: 'public' }} />
           </div>
         </div>
       </div>

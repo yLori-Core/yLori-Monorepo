@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import GitHubProvider from "next-auth/providers/github"
+import { getOrCreateUser, getUserByEmail } from "@/lib/db/queries"
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -15,31 +16,47 @@ export const authOptions: NextAuthOptions = {
   ],
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async session({ session, token }) {
-      console.log("=== SESSION CALLBACK ===")
-      console.log("Session data:", JSON.stringify(session, null, 2))
-      console.log("Token data:", JSON.stringify(token, null, 2))
-      console.log("User image URL:", session.user?.image)
-      
-      if (session.user) {
-        session.user.id = token.sub as string
+    async signIn({ user }) {
+      console.log('🔐 Auth signIn callback - creating/finding user for:', user);
+      try {
+        // Ensure user exists in our database when they sign in
+        if (user.email) {
+          console.log('🔐 Auth signIn callback - creating/finding user for:', user.email);
+          await getOrCreateUser(user.email, user.name, user.image);
+          console.log('✅ User successfully created/found in database');
+        }
+        return true;
+      } catch (error) {
+        console.error('❌ Error in signIn callback:', error);
+        // Return false to prevent sign in if database operation fails
+        return false;
       }
-      
-      console.log("Final session:", JSON.stringify(session, null, 2))
-      return session
     },
-    async jwt({ token, user, account, profile }) {
-      console.log("=== JWT CALLBACK ===")
-      console.log("Token:", JSON.stringify(token, null, 2))
-      console.log("User:", JSON.stringify(user, null, 2))
-      console.log("Account:", JSON.stringify(account, null, 2))
-      console.log("Profile:", JSON.stringify(profile, null, 2))
-      
-      if (user) {
-        token.sub = user.id
-        console.log("User ID set to token:", user.id)
+    async session({ session, token }) {
+      if (session.user && session.user.email) {
+        try {
+          // Fetch the latest user data from our database
+          const dbUser = await getUserByEmail(session.user.email);
+          if (dbUser) {
+            session.user.id = dbUser.id;
+            session.user.name = dbUser.name;
+            session.user.image = dbUser.image;
+            // Add username to session if we need it
+            (session.user as any).username = dbUser.username;
+          }
+        } catch (error) {
+          console.error('Error fetching user in session callback:', error);
+          // Fallback to token data
+          session.user.id = token.sub as string;
+        }
       }
-      return token
+      return session;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.sub = user.id;
+      }
+      return token;
     },
   },
   session: {
