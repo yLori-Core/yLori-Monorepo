@@ -1,202 +1,230 @@
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Calendar, MapPin } from "lucide-react"
 import Image from "next/image"
 import { Navbar } from "@/components/navbar"
+import Link from "next/link"
+import { ArrowRight, Calendar, Clock, Globe, MapPin, Sparkles, Zap } from "lucide-react"
 
-export default function HomePage() {
-  const events = [
-    {
-      id: 1,
-      date: "23 Jun",
-      day: "Monday",
-      time: "5:30 am • 12:00 am UTC",
-      title: "Founder Sprint: The 100-Hour Vibathon",
-      host: "StarkWare & Starknet Foundation",
-      hostAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
-      location: "Online",
-      isOnline: true,
-      status: "going",
-      attendees: [
-        "https://images.unsplash.com/photo-1494790108755-2616b612b641?w=24&h=24&fit=crop&crop=face",
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=24&h=24&fit=crop&crop=face",
-        "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=24&h=24&fit=crop&crop=face",
-      ],
-      attendeeCount: "+138",
-      image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=160&h=100&fit=crop",
-      isLive: true,
+export default function LandingPage() {
+  // Press quotes for the scrolling section
+  const pressQuotes = [
+    { source: "CoinDesk", quote: "The future of Web3 event planning" },
+    { source: "Decrypt", quote: "Solves the on-chain RSVP problem" },
+    { source: "The Block", quote: "This is where my crypto calendar exists" },
+    { source: "Ethereum Weekly", quote: "yLori is a mainstay of my Web3 life" },
+    { source: "CryptoSlate", quote: "The perfect hub for DAOs and communities" },
+    { source: "Web3 Daily", quote: "Essential tool for token-gated events" },
+  ];
+
+  // Event templates for the showcase section
+  const eventTemplates = [
+    { 
+      name: "DAO Governance", 
+      image: "/globe.svg", 
+      color: "from-teal-500/20 to-cyan-500/20" 
     },
-    {
-      id: 2,
-      date: "27 Jun",
-      day: "Friday",
-      time: "1:30 pm • 10:00 am GMT+2",
-      title: "AI / AI AGENT DAY MONACO",
-      host: "WAIBSummit x NFTFEST",
-      hostAvatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=32&h=32&fit=crop&crop=face",
-      location: "One Monte-Carlo",
-      isOnline: false,
-      status: "invited",
-      attendees: [
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=24&h=24&fit=crop&crop=face",
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=24&h=24&fit=crop&crop=face",
-        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=24&h=24&fit=crop&crop=face",
-      ],
-      attendeeCount: "",
-      image: "https://images.unsplash.com/photo-1639762681057-408e52192e55?w=160&h=100&fit=crop",
-      isLive: false,
+    { 
+      name: "NFT Minting Party", 
+      image: "/file.svg", 
+      color: "from-emerald-500/20 to-teal-500/20" 
     },
-    {
-      id: 3,
-      date: "28 Jun",
-      day: "Saturday",
-      time: "2:30 pm • 11:00 am GMT+2",
-      title: "⭐VCC Demo Day Ethcc Cannes (Yacht)🛥️",
-      host: "Pcventure",
-      hostAvatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=32&h=32&fit=crop&crop=face",
-      location: "Location Shown Upon Approval",
-      isOnline: false,
-      status: null,
-      attendees: [],
-      attendeeCount: "",
-      image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=160&h=100&fit=crop",
-      isLive: false,
+    { 
+      name: "Token Launch", 
+      image: "/window.svg", 
+      color: "from-cyan-500/20 to-sky-500/20" 
     },
-  ]
+    { 
+      name: "Hackathon", 
+      image: "/file.svg", 
+      color: "from-sky-500/20 to-indigo-500/20" 
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navigation */}
+    <div className="min-h-screen bg-gradient-to-b from-background to-background/95">
       <Navbar />
 
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        {/* Header */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between">
-            <h1 className="text-4xl font-display text-foreground text-balance">Events</h1>
-            <div className="flex items-center space-x-1">
-              <Button variant="outline" size="sm" className="bg-accent/80 border-border text-foreground font-semibold px-4 shadow-sm">
-                Upcoming
-              </Button>
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground font-semibold px-4">
-                Past
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Events List */}
-        <div className="space-y-8">
-          {events.map((event, index) => (
-            <div key={event.id} className="relative group">
-              {/* Timeline dot */}
-              <div className="absolute left-24 top-8 w-2 h-2 bg-muted-foreground/40 rounded-full"></div>
+      {/* Hero Section */}
+      <section className="relative pt-20 pb-24 overflow-hidden">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,rgba(45,212,191,0.15),transparent_50%)]"></div>
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.1),transparent_50%)]"></div>
+        
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground leading-tight">
+                Plan Web3 events in <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-cyan-400">seconds</span>
+              </h1>
+              <p className="mt-6 text-xl text-muted-foreground">
+                The easiest way to get your community on the same page with token-gated access and on-chain RSVPs
+              </p>
               
-              {/* Timeline line */}
-              {index < events.length - 1 && (
-                <div className="absolute left-24.5 top-10 w-px h-20 bg-border/60"></div>
-              )}
-
-              <div className="flex gap-10 hover:bg-accent/30 -mx-6 px-6 py-6 rounded-2xl transition-all duration-300 cursor-pointer">
-                {/* Date Column */}
-                <div className="w-24 flex-shrink-0 pt-2">
-                  <div className="text-base font-bold text-foreground">{event.date}</div>
-                  <div className="text-sm text-muted-foreground font-medium mt-1">{event.day}</div>
+              <div className="mt-10 flex flex-col sm:flex-row gap-4">
+                <Button size="lg" className="bg-foreground text-background hover:bg-foreground/90 text-base h-12 px-6 rounded-lg">
+                  <Link href="/create" className="flex items-center gap-2">
+                    Create event <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" className="border-border hover:bg-accent text-base h-12 px-6 rounded-lg">
+                  Explore events
+                </Button>
+              </div>
+              
+              {/* Web3 Features */}
+              <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="bg-teal-500/10 p-2 rounded-full">
+                    <Sparkles className="h-4 w-4 text-teal-500" />
+                  </div>
+                  <span>Token-gated access</span>
                 </div>
-
-                {/* Content Column */}
-                <div className="flex-1 min-w-0">
-                  {/* Time and Status */}
-                  <div className="flex items-center gap-4 mb-4">
-                    {event.isLive && (
-                      <Badge className="bg-red-500 text-white border-0 text-sm font-bold px-3 py-1 shadow-lg">
-                        LIVE
-                      </Badge>
-                    )}
-                    <span className="text-sm text-muted-foreground font-semibold">{event.time}</span>
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="bg-cyan-500/10 p-2 rounded-full">
+                    <MapPin className="h-4 w-4 text-cyan-500" />
                   </div>
-
-                  {/* Title */}
-                  <h3 className="text-2xl font-bold text-foreground mb-4 group-hover:text-blue-600 transition-colors line-clamp-1">
-                    {event.title}
-                  </h3>
-
-                  {/* Host */}
-                  <div className="flex items-center gap-3 mb-4">
-                    <Avatar className="w-6 h-6 ring-2 ring-background shadow-md">
-                      <AvatarImage src={event.hostAvatar} alt={event.host} />
-                      <AvatarFallback className="text-xs bg-accent text-muted-foreground font-bold">
-                        {event.host.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm text-muted-foreground font-medium">By {event.host}</span>
-                  </div>
-
-                  {/* Location */}
-                  <div className="flex items-center gap-3 mb-5">
-                    <MapPin className="w-4 h-4 text-muted-foreground/80" />
-                    <span className="text-sm text-muted-foreground font-medium">
-                      {event.isOnline ? "Online" : event.location}
-                    </span>
-                  </div>
-
-                  {/* Status and Attendees */}
-                  <div className="flex items-center gap-5">
-                    {event.status && (
-                      <Badge 
-                        variant="secondary"
-                        className={`text-sm font-bold px-4 py-2 shadow-sm ${
-                          event.status === 'going' 
-                            ? 'bg-green-500/15 text-green-700 dark:text-green-400 border-green-500/30' 
-                            : 'bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/30'
-                        }`}
-                      >
-                        {event.status === 'going' ? 'Going' : 'Invited'}
-                      </Badge>
-                    )}
-                    {event.attendees.length > 0 && (
-                      <div className="flex items-center gap-3">
-                        <div className="flex -space-x-2">
-                          {event.attendees.map((avatar, idx) => (
-                            <Avatar key={idx} className="w-7 h-7 border-2 border-background ring-1 ring-border/50 shadow-sm">
-                              <AvatarImage src={avatar} alt="Attendee" />
-                              <AvatarFallback className="text-xs bg-accent font-bold">U</AvatarFallback>
-                            </Avatar>
-                          ))}
-                        </div>
-                        {event.attendeeCount && (
-                          <span className="text-sm text-muted-foreground font-bold">
-                            {event.attendeeCount}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                  <span>On-chain RSVPs</span>
                 </div>
-
-                {/* Event Image */}
-                <div className="w-40 h-24 flex-shrink-0">
-                  <Image
-                    src={event.image}
-                    alt={event.title}
-                    width={160}
-                    height={96}
-                    className="w-full h-full object-cover rounded-xl border border-border/60 shadow-lg"
-                  />
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="bg-emerald-500/10 p-2 rounded-full">
+                    <Zap className="h-4 w-4 text-emerald-500" />
+                  </div>
+                  <span>NFT ticketing</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="bg-sky-500/10 p-2 rounded-full">
+                    <Calendar className="h-4 w-4 text-sky-500" />
+                  </div>
+                  <span>Multi-chain support</span>
                 </div>
               </div>
             </div>
+            
+            <div className="relative">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500 to-cyan-400 rounded-3xl blur-xl opacity-20 animate-pulse"></div>
+              <div className="relative bg-black/5 dark:bg-white/5 border border-border rounded-3xl overflow-hidden shadow-xl">
+                <Image
+                  src="/vercel.svg"
+                  alt="Event page mockup"
+                  width={600}
+                  height={800}
+                  className="w-full h-auto"
+                  priority
+                />
+              </div>
+              
+              {/* Floating elements */}
+              <div className="absolute -top-6 -right-6 bg-gradient-to-br from-teal-500 to-cyan-400 text-white px-4 py-2 rounded-lg shadow-lg transform rotate-6">
+                <span className="text-sm font-bold">100+ attendees</span>
+              </div>
+              <div className="absolute bottom-12 -left-8 bg-background border border-border px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 transform -rotate-6">
+                <Calendar className="h-5 w-5 text-teal-500" />
+                <span className="text-sm font-medium">Starts in 2 days</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Press Quotes - Infinite Scroll */}
+      <section className="py-12 bg-accent/30 border-y border-border overflow-hidden">
+        <div className="flex animate-marquee whitespace-nowrap">
+          {[...pressQuotes, ...pressQuotes].map((quote, index) => (
+            <div key={index} className="mx-8 flex items-center">
+              <span className="text-xl md:text-2xl font-bold text-foreground/80">"{quote.quote}"</span>
+              <span className="mx-2">—</span>
+              <span className="text-lg md:text-xl font-medium text-muted-foreground">{quote.source}</span>
+            </div>
           ))}
         </div>
+      </section>
 
-        {/* Load More */}
-        <div className="text-center mt-16">
-          <Button variant="outline" className="text-muted-foreground border-border hover:bg-accent font-semibold px-8 py-3 shadow-sm">
-            Load more events
+      {/* Event Templates Section */}
+      <section className="py-24">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
+              For every Web3 occasion, <br/>
+              every <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-cyan-400">vibe</span> 🎉
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              No more boring invitations or complicated token gates
+            </p>
+          </div>
+          
+          {/* Rotating Event Templates */}
+          <div className="relative h-[500px] perspective">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 transform-style-3d animate-float">
+                {eventTemplates.map((template, index) => (
+                  <div 
+                    key={index} 
+                    className={`relative aspect-[3/4] rounded-2xl overflow-hidden border border-border shadow-xl bg-gradient-to-br ${template.color} p-6 transform transition-transform hover:scale-105`}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                    <div className="relative h-full flex flex-col justify-between">
+                      <div className="w-12 h-12 bg-background/80 backdrop-blur-sm rounded-full flex items-center justify-center">
+                        <Image src={template.image} alt={template.name} width={24} height={24} />
+                      </div>
+                      <h3 className="text-xl font-bold text-foreground">{template.name}</h3>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          <div className="text-center mt-12">
+            <Button size="lg" className="bg-foreground text-background hover:bg-foreground/90 text-base h-12 px-6 rounded-lg">
+              <Link href="/create" className="flex items-center gap-2">
+                Create event <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-24 bg-accent/30 border-y border-border">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="space-y-4">
+              <div className="bg-teal-500/10 p-3 rounded-xl w-fit">
+                <Sparkles className="h-6 w-6 text-teal-500" />
+              </div>
+              <h3 className="text-xl font-bold">Token-gated events</h3>
+              <p className="text-muted-foreground">Limit access to your events based on token ownership, NFTs, or DAO membership.</p>
+            </div>
+            <div className="space-y-4">
+              <div className="bg-cyan-500/10 p-3 rounded-xl w-fit">
+                <Globe className="h-6 w-6 text-cyan-500" />
+              </div>
+              <h3 className="text-xl font-bold">On-chain RSVPs</h3>
+              <p className="text-muted-foreground">Attendees can RSVP with their wallet, creating a verifiable record on the blockchain.</p>
+            </div>
+            <div className="space-y-4">
+              <div className="bg-sky-500/10 p-3 rounded-xl w-fit">
+                <MapPin className="h-6 w-6 text-sky-500" />
+              </div>
+              <h3 className="text-xl font-bold">Virtual & IRL events</h3>
+              <p className="text-muted-foreground">Host events online with video integration or in-person with location verification.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24">
+        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
+          <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
+            Ready to host your next Web3 event?
+          </h2>
+          <p className="text-xl text-muted-foreground mb-10">
+            Join thousands of DAOs, communities, and protocols using yLori to connect with their members.
+          </p>
+          <Button size="lg" className="bg-foreground text-background hover:bg-foreground/90 text-base h-12 px-8 rounded-lg">
+            <Link href="/create">Get started</Link>
           </Button>
         </div>
-      </div>
+      </section>
     </div>
   )
 }
