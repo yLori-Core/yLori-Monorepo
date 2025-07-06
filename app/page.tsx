@@ -18,24 +18,24 @@ export default function LandingPage() {
   // Event templates for the showcase section
   const eventTemplates = [
     { 
-      name: "DAO Governance", 
+      name: "Conference", 
       image: "/globe.svg", 
-      color: "from-teal-500/20 to-cyan-500/20" 
+      color: "from-teal-500/40 to-cyan-500/40" 
     },
     { 
-      name: "NFT Minting Party", 
+      name: "Workshop", 
       image: "/file.svg", 
-      color: "from-emerald-500/20 to-teal-500/20" 
+      color: "from-emerald-500/40 to-teal-500/40" 
     },
     { 
-      name: "Token Launch", 
+      name: "Meetup", 
       image: "/window.svg", 
-      color: "from-cyan-500/20 to-sky-500/20" 
+      color: "from-cyan-500/40 to-sky-500/40" 
     },
     { 
       name: "Hackathon", 
       image: "/file.svg", 
-      color: "from-sky-500/20 to-indigo-500/20" 
+      color: "from-sky-500/40 to-indigo-500/40" 
     },
   ];
 
@@ -124,6 +124,11 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Section Divider */}
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
+      </div>
+
       {/* Press Quotes - Infinite Scroll */}
       <section className="py-12 bg-accent/30 border-y border-border overflow-hidden">
         <div className="flex animate-marquee whitespace-nowrap">
@@ -137,50 +142,123 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Section Divider */}
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
+      </div>
+
       {/* Event Templates Section */}
       <section className="py-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-10">
             <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
-              For every Web3 occasion, <br/>
-              every <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-cyan-400">vibe</span> 🎉
+              Choose your event type
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              No more boring invitations or complicated token gates
+              Create Web3-enabled events with token gating, on-chain RSVPs, and more
             </p>
           </div>
           
-          {/* Rotating Event Templates */}
-          <div className="relative h-[500px] perspective">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 transform-style-3d animate-float">
+          {/* Optimized Event Templates with Animations */}
+          <div className="relative py-10">
+            <div className="max-w-5xl mx-auto">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 {eventTemplates.map((template, index) => (
-                  <div 
+                  <Link 
+                    href="/create" 
                     key={index} 
-                    className={`relative aspect-[3/4] rounded-2xl overflow-hidden border border-border shadow-xl bg-gradient-to-br ${template.color} p-6 transform transition-transform hover:scale-105`}
+                    className="group relative block aspect-[3/4] rounded-xl overflow-hidden will-change-transform"
+                    style={{ 
+                      animation: `float 8s ease-in-out ${index * 1}s infinite`,
+                      animationFillMode: 'both'
+                    }}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                    <div className="relative h-full flex flex-col justify-between">
-                      <div className="w-12 h-12 bg-background/80 backdrop-blur-sm rounded-full flex items-center justify-center">
-                        <Image src={template.image} alt={template.name} width={24} height={24} />
-                      </div>
-                      <h3 className="text-xl font-bold text-foreground">{template.name}</h3>
+                    {/* Animated glow effect */}
+                    <div 
+                      className={`absolute inset-0 rounded-xl bg-gradient-to-br ${template.color} blur-md opacity-40 group-hover:opacity-60 transition-opacity duration-300 ease-out`}
+                      style={{ 
+                        animation: `pulse 4s ease-in-out ${index * 0.5}s infinite alternate`,
+                        transformOrigin: 'center',
+                        willChange: 'opacity, transform'
+                      }}
+                    ></div>
+                    
+                    {/* Card background */}
+                    <div 
+                      className={`absolute inset-0 bg-gradient-to-br ${template.color} transition-transform duration-300 ease-out group-hover:scale-[1.03] will-change-transform`}
+                    ></div>
+                    
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    
+                    {/* Animated particles - limited to 3 for performance */}
+                    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                      {[...Array(3)].map((_, i) => (
+                        <div 
+                          key={i}
+                          className="absolute w-1 h-1 rounded-full bg-white/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          style={{
+                            top: `${20 + (i * 30)}%`,
+                            left: `${20 + (i * 30)}%`,
+                            animation: `particle 3s ease-out ${i * 0.5}s infinite`,
+                            willChange: 'transform, opacity'
+                          }}
+                        ></div>
+                      ))}
                     </div>
-                  </div>
+                    
+                    {/* Content */}
+                    <div className="relative h-full flex flex-col p-5 justify-between z-10">
+                      <div className="w-14 h-14 bg-background/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md transform transition-transform duration-300 ease-out group-hover:scale-110 group-hover:shadow-lg will-change-transform">
+                        <Image 
+                          src={template.image} 
+                          alt={template.name} 
+                          width={28} 
+                          height={28}
+                          className="opacity-90 group-hover:opacity-100 transition-opacity"
+                        />
+                      </div>
+                      
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-1 transform transition-all duration-300 ease-out group-hover:translate-y-[-2px] will-change-transform">
+                          {template.name}
+                        </h3>
+                        
+                        {/* Animated underline */}
+                        <div className="w-12 h-0.5 bg-white/70 rounded transition-all duration-300 ease-out group-hover:w-full will-change-transform"></div>
+                        
+                        {/* Text that fades in on hover */}
+                        <p className="mt-2 text-sm text-white/0 group-hover:text-white/90 transition-all duration-300 ease-out">
+                          Create your next Web3 event
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
                 ))}
               </div>
             </div>
           </div>
           
           <div className="text-center mt-12">
-            <Button size="lg" className="bg-foreground text-background hover:bg-foreground/90 text-base h-12 px-6 rounded-lg">
-              <Link href="/create" className="flex items-center gap-2">
-                Create event <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
+            <div className="relative inline-block group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 to-cyan-400 rounded-lg blur-sm opacity-25 group-hover:opacity-50 transition-all duration-300 ease-out"></div>
+              <Button 
+                size="lg" 
+                className="relative bg-teal-600 hover:bg-teal-700 text-white text-base h-12 px-8 rounded-lg shadow-md transition-all duration-300 ease-out will-change-transform group-hover:shadow-teal-500/20 group-hover:translate-y-[-1px]"
+              >
+                <Link href="/create" className="flex items-center gap-2">
+                  Create custom event <ArrowRight className="h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-1" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Section Divider */}
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
+      </div>
 
       {/* Features Section */}
       <section className="py-24 bg-accent/30 border-y border-border">

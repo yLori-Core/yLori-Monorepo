@@ -29,7 +29,7 @@ export async function Navbar() {
         <div className="flex justify-between items-center h-14">
           <div className="flex items-center space-x-8">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-6 h-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded-md flex items-center justify-center">
+              <div className="w-6 h-6 bg-gradient-to-r from-teal-500 to-cyan-400 rounded-md flex items-center justify-center">
                 <span className="text-white font-bold text-xs">yL</span>
               </div>
               <span className="text-lg font-semibold text-foreground">yLori</span>
