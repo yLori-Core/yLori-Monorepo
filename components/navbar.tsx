@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Calendar, Search, Bell, Globe, LogOut, User, Plus } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { AuthModal } from "@/components/auth-modal"
 import { SignOutButton } from "@/components/sign-out-button"
@@ -29,9 +30,13 @@ export async function Navbar() {
         <div className="flex justify-between items-center h-14">
           <div className="flex items-center space-x-8">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-6 h-6 bg-gradient-to-r from-teal-500 to-cyan-400 rounded-md flex items-center justify-center">
-                <span className="text-white font-bold text-xs">yL</span>
-              </div>
+              <Image 
+                src="/logo.png" 
+                alt="yLori Logo" 
+                width={24} 
+                height={24} 
+                className="w-6 h-6 object-contain"
+              />
               <span className="text-lg font-semibold text-foreground">yLori</span>
             </Link>
             
