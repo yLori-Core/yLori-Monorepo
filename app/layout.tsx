@@ -7,12 +7,14 @@ const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
+  fallback: ['system-ui', 'arial'],
 });
 
 const jakarta = Plus_Jakarta_Sans({ 
   subsets: ["latin"],
   variable: "--font-jakarta",
   display: "swap",
+  fallback: ['system-ui', 'arial'],
 });
 
 export const metadata: Metadata = {

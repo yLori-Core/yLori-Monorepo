@@ -35,7 +35,13 @@ export default async function UserProfilePage({ params }: { params: Promise<{ us
           {/* Avatar */}
           <div className="flex-shrink-0">
             <Avatar className="w-32 h-32 ring-4 ring-background shadow-2xl">
-              <AvatarImage src={user.image || ''} alt={user.name || ''} />
+              {user.image ? (
+                <AvatarImage 
+                  src={user.image} 
+                  alt={user.name || user.username || ""}
+                  referrerPolicy="no-referrer"
+                />
+              ) : null}
               <AvatarFallback className="text-2xl bg-accent text-muted-foreground font-bold">
                 {user.name?.split(' ').map(n => n[0]).join('') || user.username?.slice(0, 2).toUpperCase()}
               </AvatarFallback>

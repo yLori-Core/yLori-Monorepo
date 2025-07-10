@@ -69,26 +69,26 @@ export function AuthModal({ children }: AuthModalProps) {
       <DialogContent className="sm:max-w-[440px] p-0 overflow-hidden bg-background border-border/50 shadow-2xl">
         <div className="px-8 py-8">
           <DialogHeader className="text-center mb-8">
-            <div className="flex justify-center mb-6">
-              <div className="w-16 h-16 relative overflow-hidden">
+            <div className="flex flex-col items-center justify-center mb-6">
+              <div className="w-16 h-16 relative overflow-hidden mx-auto">
                 <Image 
-                  src="/logo.png" 
+                  src="/logo_initial.png" 
                   alt="yLori Logo" 
                   width={64} 
                   height={64} 
                   className="object-contain mix-blend-multiply dark:mix-blend-screen"
                 />
               </div>
+              <DialogTitle className="text-2xl font-display text-foreground mt-4">
+                {showComingSoon ? 'Coming Soon!' : 'Welcome to yLori'}
+              </DialogTitle>
+              <DialogDescription className="text-base text-muted-foreground mt-2 max-w-xs mx-auto">
+                {showComingSoon 
+                  ? 'Email authentication is coming soon. Use Google or GitHub for now.' 
+                  : 'Sign in to discover amazing Web3 events'
+                }
+              </DialogDescription>
             </div>
-            <DialogTitle className="text-2xl font-display text-foreground">
-              {showComingSoon ? 'Coming Soon!' : 'Welcome to yLori'}
-            </DialogTitle>
-            <DialogDescription className="text-base text-muted-foreground mt-2">
-              {showComingSoon 
-                ? 'Email authentication is coming soon. Use Google or GitHub for now.' 
-                : 'Sign in to discover amazing Web3 events'
-              }
-            </DialogDescription>
           </DialogHeader>
 
           {showComingSoon ? (
