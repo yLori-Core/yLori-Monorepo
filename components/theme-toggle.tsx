@@ -49,7 +49,7 @@ export function ThemeToggle() {
       variant="ghost"
       size="sm"
       onClick={toggleTheme}
-      className="w-9 h-9 p-0"
+      className="w-9 h-9 p-0 hover:bg-[#f47e5c]/10 text-muted-foreground hover:text-[#f47e5c]"
     >
       {isDark ? (
         <Sun className="h-4 w-4" />

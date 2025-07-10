@@ -5,18 +5,6 @@ import Link from "next/link"
 import { ArrowRight, Calendar, Clock, Globe, MapPin, Sparkles, Zap, User, Twitter, Github, Linkedin } from "lucide-react"
 
 export default function LandingPage() {
-  // Press quotes for the scrolling section
-  const pressQuotes = [
-    { source: "CoinDesk", quote: "The future of Web3 event planning" },
-    { source: "Decrypt", quote: "Solves the on-chain RSVP problem" },
-    { source: "The Block", quote: "This is where my crypto calendar exists" },
-    { source: "Ethereum Weekly", quote: "yLori is a mainstay of my Web3 life" },
-    { source: "CryptoSlate", quote: "The perfect hub for DAOs and communities" },
-    { source: "Web3 Daily", quote: "Essential tool for token-gated events" },
-    { source: "Blockchain Times", quote: "Revolutionizing how Web3 communities gather" },
-    { source: "DeFi Pulse", quote: "The gold standard for crypto events" },
-  ];
-
   // Web3 features for the showcase section
   const web3Features = [
     { 
@@ -79,26 +67,26 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative h-[calc(100vh-4rem)] flex items-center overflow-hidden">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,rgba(45,212,191,0.15),transparent_50%)]"></div>
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.1),transparent_50%)]"></div>
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,rgba(155,111,181,0.15),transparent_50%)]"></div>
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_bottom_left,rgba(244,126,92,0.1),transparent_50%)]"></div>
         
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-                Plan Web3 events in <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-cyan-400">seconds</span>
+                Plan Web3 events in <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#9b6fb5] via-[#e36c89] to-[#f47e5c]">seconds</span>
               </h1>
               <p className="mt-4 text-lg text-muted-foreground">
                 The easiest way to get your community on the same page with token-gated access and on-chain RSVPs
               </p>
               
               <div className="mt-6 flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="bg-foreground text-background hover:bg-foreground/90 text-base h-11 px-6 rounded-lg">
+                <Button size="lg" className="bg-[#e36c89] hover:bg-[#d15e7b] text-white text-base h-11 px-6 rounded-lg">
                   <Link href="/create" className="flex items-center gap-2">
                     Create event <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="border-border hover:bg-accent text-base h-11 px-6 rounded-lg">
+                <Button size="lg" variant="outline" className="border-border hover:bg-accent/10 text-base h-11 px-6 rounded-lg">
                   Explore events
                 </Button>
               </div>
@@ -106,26 +94,26 @@ export default function LandingPage() {
               {/* Web3 Features */}
               <div className="mt-6 grid grid-cols-2 gap-3">
                 <div className="flex items-center gap-2 text-sm">
-                  <div className="bg-teal-500/10 p-1.5 rounded-full">
-                    <Sparkles className="h-3.5 w-3.5 text-teal-500" />
+                  <div className="bg-[#9b6fb5]/10 p-1.5 rounded-full">
+                    <Sparkles className="h-3.5 w-3.5 text-[#9b6fb5]" />
                   </div>
                   <span>Token-gated access</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <div className="bg-cyan-500/10 p-1.5 rounded-full">
-                    <MapPin className="h-3.5 w-3.5 text-cyan-500" />
+                  <div className="bg-[#e36c89]/10 p-1.5 rounded-full">
+                    <MapPin className="h-3.5 w-3.5 text-[#e36c89]" />
                   </div>
                   <span>On-chain RSVPs</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <div className="bg-emerald-500/10 p-1.5 rounded-full">
-                    <Zap className="h-3.5 w-3.5 text-emerald-500" />
+                  <div className="bg-[#f47e5c]/10 p-1.5 rounded-full">
+                    <Zap className="h-3.5 w-3.5 text-[#f47e5c]" />
                   </div>
                   <span>NFT ticketing</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <div className="bg-sky-500/10 p-1.5 rounded-full">
-                    <Calendar className="h-3.5 w-3.5 text-sky-500" />
+                  <div className="bg-[#b85c9e]/10 p-1.5 rounded-full">
+                    <Calendar className="h-3.5 w-3.5 text-[#b85c9e]" />
                   </div>
                   <span>Multi-chain support</span>
                 </div>
@@ -133,7 +121,7 @@ export default function LandingPage() {
             </div>
             
             <div className="relative">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500 to-cyan-400 rounded-2xl blur-lg opacity-20 animate-pulse"></div>
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-[#9b6fb5] to-[#f47e5c] rounded-2xl blur-lg opacity-20 animate-pulse"></div>
               <div className="relative bg-black/5 dark:bg-white/5 border border-border rounded-2xl overflow-hidden shadow-xl max-h-[500px]">
                 <Link href="https://ethglobal.com/events/newdelhi" target="_blank" rel="noopener noreferrer">
                   <Image
@@ -148,14 +136,14 @@ export default function LandingPage() {
               </div>
               
               {/* Floating elements */}
-              <div className="absolute -top-4 -right-4 bg-gradient-to-br from-teal-700 to-cyan-600 text-white px-3 py-1.5 rounded-lg shadow-lg transform rotate-6">
+              <div className="absolute -top-4 -right-4 bg-gradient-to-br from-[#9b6fb5] to-[#e36c89] text-white px-3 py-1.5 rounded-lg shadow-lg transform rotate-6">
                 <div className="flex items-center gap-1.5">
                   <MapPin className="h-3 w-3" />
                   <span className="text-xs font-bold">Delhi, India</span>
                 </div>
               </div>
               <div className="absolute bottom-8 -left-6 bg-background border border-border px-3 py-2 rounded-xl shadow-lg flex items-center gap-2 transform -rotate-6">
-                <Calendar className="h-4 w-4 text-teal-500" />
+                <Calendar className="h-4 w-4 text-[#e36c89]" />
                 <span className="text-xs font-medium">Sept, 25</span>
               </div>
             </div>
@@ -163,41 +151,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Section Divider */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
-      </div>
-
-      {/* Press Quotes - Infinite Scroll */}
-      <section className="py-12 bg-accent/30 border-y border-border">
-        <div className="marquee">
-          <div className="marquee-track">
-            {/* First set of quotes */}
-            {pressQuotes.map((quote, index) => (
-              <div key={`quote-1-${index}`} className="marquee-item">
-                <span className="text-xl md:text-2xl font-bold text-foreground/80">"{quote.quote}"</span>
-                <span className="mx-2">—</span>
-                <span className="text-lg md:text-xl font-medium text-muted-foreground">{quote.source}</span>
-              </div>
-            ))}
-            
-            {/* Duplicate set for seamless loop */}
-            {pressQuotes.map((quote, index) => (
-              <div key={`quote-2-${index}`} className="marquee-item">
-                <span className="text-xl md:text-2xl font-bold text-foreground/80">"{quote.quote}"</span>
-                <span className="mx-2">—</span>
-                <span className="text-lg md:text-xl font-medium text-muted-foreground">{quote.source}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Section Divider */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
-      </div>
-      
       {/* Featured Events Section */}
       <section className="py-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -206,7 +159,7 @@ export default function LandingPage() {
               <h2 className="text-3xl md:text-4xl font-bold text-foreground">Featured Events</h2>
               <p className="mt-2 text-lg text-muted-foreground">Discover the hottest Web3 gatherings</p>
             </div>
-            <Button variant="outline" className="border-border hover:bg-accent">
+            <Button variant="outline" className="border-border hover:bg-accent/10">
               <Link href="/events" className="flex items-center gap-2">
                 Explore all events <ArrowRight className="h-4 w-4" />
               </Link>
@@ -235,7 +188,7 @@ export default function LandingPage() {
                     />
                     <div className="absolute bottom-3 left-4 z-20 flex items-center gap-2">
                       <div className="bg-background/80 backdrop-blur-sm px-2 py-1 rounded-md flex items-center gap-1.5">
-                        <Calendar className="h-3.5 w-3.5 text-teal-500" />
+                        <Calendar className="h-3.5 w-3.5 text-[#e36c89]" />
                         <span className="text-xs font-medium">{event.date}</span>
                       </div>
                     </div>
@@ -243,14 +196,14 @@ export default function LandingPage() {
                   
                   {/* Event details */}
                   <div className="p-5">
-                    <h3 className="text-xl font-bold mb-2 group-hover:text-teal-500 transition-colors">{event.title}</h3>
+                    <h3 className="text-xl font-bold mb-2 group-hover:text-[#9b6fb5] transition-colors">{event.title}</h3>
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                       <div className="flex items-center gap-1.5">
-                        <MapPin className="h-3.5 w-3.5" />
+                        <MapPin className="h-3.5 w-3.5 text-[#e36c89]" />
                         <span>{event.location}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <User className="h-3.5 w-3.5" />
+                        <User className="h-3.5 w-3.5 text-[#f47e5c]" />
                         <span>{event.attendees.toLocaleString()} attendees</span>
                       </div>
                     </div>
@@ -261,11 +214,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      {/* Section Divider */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
-      </div>
 
       {/* Web3 Features Showcase Section */}
       <section className="py-24">
@@ -283,7 +231,17 @@ export default function LandingPage() {
           <div className="relative py-10">
             <div className="max-w-5xl mx-auto">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                {web3Features.map((feature, index) => (
+                {web3Features.map((feature, index) => {
+                  // Create a color array from the logo colors
+                  const colors = [
+                    "from-[#9b6fb5]/40 to-[#b85c9e]/40", 
+                    "from-[#e36c89]/40 to-[#dc8674]/40", 
+                    "from-[#f47e5c]/40 to-[#f58e6c]/40",
+                    "from-[#b85c9e]/40 to-[#9b6fb5]/40"
+                  ];
+                  const color = colors[index % colors.length];
+                  
+                  return (
                   <div 
                     key={index} 
                     className="group relative block aspect-[3/4] rounded-xl overflow-hidden will-change-transform"
@@ -294,7 +252,7 @@ export default function LandingPage() {
                   >
                     {/* Animated glow effect */}
                     <div 
-                      className={`absolute inset-0 rounded-xl bg-gradient-to-br ${feature.color} blur-md opacity-40 group-hover:opacity-60 transition-opacity duration-300 ease-out`}
+                      className={`absolute inset-0 rounded-xl bg-gradient-to-br ${color} blur-md opacity-40 group-hover:opacity-60 transition-opacity duration-300 ease-out`}
                       style={{ 
                         animation: `pulse 4s ease-in-out ${index * 0.5}s infinite alternate`,
                         transformOrigin: 'center',
@@ -304,7 +262,7 @@ export default function LandingPage() {
                     
                     {/* Card background */}
                     <div 
-                      className={`absolute inset-0 bg-gradient-to-br ${feature.color} transition-transform duration-300 ease-out group-hover:scale-[1.03] will-change-transform`}
+                      className={`absolute inset-0 bg-gradient-to-br ${color} transition-transform duration-300 ease-out group-hover:scale-[1.03] will-change-transform`}
                     ></div>
                     
                     {/* Gradient overlay */}
@@ -353,17 +311,17 @@ export default function LandingPage() {
                       </div>
                     </div>
                   </div>
-                ))}
+                )})}
               </div>
             </div>
           </div>
           
           <div className="text-center mt-12">
             <div className="relative inline-block group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 to-cyan-400 rounded-lg blur-sm opacity-25 group-hover:opacity-50 transition-all duration-300 ease-out"></div>
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#9b6fb5] to-[#f47e5c] rounded-lg blur-sm opacity-25 group-hover:opacity-50 transition-all duration-300 ease-out"></div>
               <Button 
                 size="lg" 
-                className="relative bg-teal-600 hover:bg-teal-700 text-white text-base h-12 px-8 rounded-lg shadow-md transition-all duration-300 ease-out will-change-transform group-hover:shadow-teal-500/20 group-hover:translate-y-[-1px]"
+                className="relative bg-[#e36c89] hover:bg-[#d15e7b] text-white text-base h-12 px-8 rounded-lg shadow-md transition-all duration-300 ease-out will-change-transform group-hover:shadow-[#e36c89]/20 group-hover:translate-y-[-1px]"
               >
                 <Link href="/create" className="flex items-center gap-2">
                   Create your event <ArrowRight className="h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-1" />
@@ -374,38 +332,113 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Section Divider */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
-      </div>
+      {/* Testimonials Section */}
+      <section className="py-24">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Trusted by Web3 Communities</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              See why leading organizations and DAOs choose yLori for their event management needs
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Testimonial 1 */}
+            <div className="bg-card p-6 rounded-xl border relative">
+              <div className="absolute -top-3 -left-3 w-10 h-10 bg-[#9b6fb5] rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-white text-2xl font-serif">"</span>
+              </div>
+              <p className="mb-6 pt-4">
+                yLori has completely transformed how we manage our community events. The token gating feature ensures only our members can attend, and the on-chain RSVPs provide perfect accountability.
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center mr-4">
+                  <span className="text-[#9b6fb5] font-bold text-xl">E</span>
+                </div>
+                <div>
+                  <h4 className="font-bold">Elena Rodriguez</h4>
+                  <p className="text-sm text-muted-foreground">Community Lead, EthereumDAO</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Testimonial 2 */}
+            <div className="bg-card p-6 rounded-xl border relative">
+              <div className="absolute -top-3 -left-3 w-10 h-10 bg-[#e36c89] rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-white text-2xl font-serif">"</span>
+              </div>
+              <p className="mb-6 pt-4">
+                Since switching to yLori, our event attendance has increased by 40%. The NFT ticketing system adds a collectible element that our community loves, and the platform is incredibly easy to use.
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center mr-4">
+                  <span className="text-[#e36c89] font-bold text-xl">M</span>
+                </div>
+                <div>
+                  <h4 className="font-bold">Michael Chen</h4>
+                  <p className="text-sm text-muted-foreground">Founder, NFT Creators Guild</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Testimonial 3 */}
+            <div className="bg-card p-6 rounded-xl border relative">
+              <div className="absolute -top-3 -left-3 w-10 h-10 bg-[#f47e5c] rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-white text-2xl font-serif">"</span>
+              </div>
+              <p className="mb-6 pt-4">
+                We've hosted over 50 events on yLori in the past year. The multi-chain support allows us to engage with communities across different ecosystems seamlessly. It's become our go-to platform.
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center mr-4">
+                  <span className="text-[#f47e5c] font-bold text-xl">S</span>
+                </div>
+                <div>
+                  <h4 className="font-bold">Sarah Johnson</h4>
+                  <p className="text-sm text-muted-foreground">Events Director, Crypto Collective</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-16 text-center">
+            <Button 
+              className="bg-[#e36c89] hover:bg-[#d15e7b] text-white font-medium px-8 py-6 h-auto text-base rounded-lg shadow-lg"
+            >
+              <Link href="/create" className="flex items-center gap-2">
+                Start planning your event <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
-      <footer className="bg-accent/30 border-t border-border py-16">
+      <footer className="py-16 border-t border-border">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
             {/* Logo and description */}
             <div className="space-y-4">
               <Link href="/" className="flex items-center space-x-2">
                 <Image 
-                  src="/logo.png" 
+                  src="/logo_full.png" 
                   alt="yLori Logo" 
-                  width={32} 
-                  height={32} 
-                  className="w-8 h-8 object-contain"
+                  width={120} 
+                  height={40} 
+                  className="h-10 w-auto object-contain"
                 />
-                <span className="text-xl font-semibold text-foreground">yLori</span>
               </Link>
               <p className="text-sm text-muted-foreground">
                 The easiest way to plan and manage Web3 events with token-gated access and on-chain RSVPs.
               </p>
               <div className="flex space-x-4 pt-2">
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-[#9b6fb5] transition-colors">
                   <Twitter className="h-5 w-5" />
                 </a>
-                <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-[#e36c89] transition-colors">
                   <Github className="h-5 w-5" />
                 </a>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-[#f47e5c] transition-colors">
                   <Linkedin className="h-5 w-5" />
                 </a>
               </div>
@@ -413,25 +446,25 @@ export default function LandingPage() {
 
             {/* Product links */}
             <div>
-              <h3 className="font-medium text-foreground mb-4">Product</h3>
+              <h3 className="font-medium mb-4">Product</h3>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/events" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link href="/events" className="text-sm text-muted-foreground hover:text-[#e36c89] transition-colors">
                     Explore Events
                   </Link>
                 </li>
                 <li>
-                  <Link href="/create" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link href="/create" className="text-sm text-muted-foreground hover:text-[#e36c89] transition-colors">
                     Create Event
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link href="#" className="text-sm text-muted-foreground hover:text-[#e36c89] transition-colors">
                     Token Gating
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link href="#" className="text-sm text-muted-foreground hover:text-[#e36c89] transition-colors">
                     NFT Ticketing
                   </Link>
                 </li>
@@ -440,25 +473,25 @@ export default function LandingPage() {
 
             {/* Company links */}
             <div>
-              <h3 className="font-medium text-foreground mb-4">Company</h3>
+              <h3 className="font-medium mb-4">Company</h3>
               <ul className="space-y-2">
                 <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link href="#" className="text-sm text-muted-foreground hover:text-[#9b6fb5] transition-colors">
                     About Us
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link href="#" className="text-sm text-muted-foreground hover:text-[#9b6fb5] transition-colors">
                     Careers
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link href="#" className="text-sm text-muted-foreground hover:text-[#9b6fb5] transition-colors">
                     Blog
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link href="#" className="text-sm text-muted-foreground hover:text-[#9b6fb5] transition-colors">
                     Contact
                   </Link>
                 </li>
@@ -467,20 +500,20 @@ export default function LandingPage() {
 
             {/* Legal links */}
             <div>
-              <h3 className="font-medium text-foreground mb-4">Legal</h3>
+              <h3 className="font-medium mb-4">Legal</h3>
               <ul className="space-y-2">
                 <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link href="#" className="text-sm text-muted-foreground hover:text-[#f47e5c] transition-colors">
                     Terms of Service
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link href="#" className="text-sm text-muted-foreground hover:text-[#f47e5c] transition-colors">
                     Privacy Policy
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link href="#" className="text-sm text-muted-foreground hover:text-[#f47e5c] transition-colors">
                     Cookie Policy
                   </Link>
                 </li>
@@ -488,20 +521,20 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="h-px bg-border/50 my-8"></div>
+          <div className="h-px bg-border my-8"></div>
 
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-muted-foreground">
               © {new Date().getFullYear()} yLori. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <Link href="#" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="#" className="text-xs text-muted-foreground hover:text-[#e36c89] transition-colors">
                 Privacy
               </Link>
-              <Link href="#" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="#" className="text-xs text-muted-foreground hover:text-[#9b6fb5] transition-colors">
                 Terms
               </Link>
-              <Link href="#" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="#" className="text-xs text-muted-foreground hover:text-[#f47e5c] transition-colors">
                 Cookies
               </Link>
             </div>

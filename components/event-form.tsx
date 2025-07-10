@@ -129,7 +129,7 @@ export function EventForm({ initialData }: EventFormProps) {
                     !startDate && "text-muted-foreground"
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <CalendarIcon className="mr-2 h-4 w-4 text-[#e36c89]" />
                   {startDate ? format(startDate, "PPP") : "Pick a date"}
                 </Button>
               </PopoverTrigger>
@@ -143,7 +143,7 @@ export function EventForm({ initialData }: EventFormProps) {
               </PopoverContent>
             </Popover>
             <div className="flex items-center gap-2 sm:w-auto w-full">
-              <Clock className="h-4 w-4 text-muted-foreground" />
+              <Clock className="h-4 w-4 text-[#9b6fb5]" />
               <Input
                 type="time"
                 value={startTime}
@@ -167,7 +167,7 @@ export function EventForm({ initialData }: EventFormProps) {
                     !endDate && "text-muted-foreground"
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <CalendarIcon className="mr-2 h-4 w-4 text-[#e36c89]" />
                   {endDate ? format(endDate, "PPP") : "Pick a date"}
                 </Button>
               </PopoverTrigger>
@@ -181,7 +181,7 @@ export function EventForm({ initialData }: EventFormProps) {
               </PopoverContent>
             </Popover>
             <div className="flex items-center gap-2 sm:w-auto w-full">
-              <Clock className="h-4 w-4 text-muted-foreground" />
+              <Clock className="h-4 w-4 text-[#9b6fb5]" />
               <Input
                 type="time"
                 value={endTime}
@@ -199,7 +199,7 @@ export function EventForm({ initialData }: EventFormProps) {
         <div className="space-y-2">
           <label className="text-sm font-medium">Timezone</label>
           <Select value={timezone} onValueChange={setTimezone}>
-            <SelectTrigger>
+            <SelectTrigger className="border-border focus:ring-[#9b6fb5]/20">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -215,7 +215,7 @@ export function EventForm({ initialData }: EventFormProps) {
         <div className="space-y-2">
           <label className="text-sm font-medium">Event Type</label>
           <Select value={eventType} onValueChange={(value: 'in_person' | 'virtual' | 'hybrid') => setEventType(value)}>
-            <SelectTrigger>
+            <SelectTrigger className="border-border focus:ring-[#9b6fb5]/20">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -231,10 +231,10 @@ export function EventForm({ initialData }: EventFormProps) {
       <div className="space-y-3">
         {!showLocationInput ? (
           <div 
-            className="flex items-center gap-3 p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
+            className="flex items-center gap-3 p-4 border border-border rounded-lg hover:bg-[#9b6fb5]/5 transition-colors cursor-pointer"
             onClick={() => setShowLocationInput(true)}
           >
-            <MapPin className="w-5 h-5 text-muted-foreground" />
+            <MapPin className="w-5 h-5 text-[#e36c89]" />
             <div>
               <div className="font-medium text-foreground">Add Event Location</div>
               <div className="text-sm text-muted-foreground">
@@ -271,129 +271,126 @@ export function EventForm({ initialData }: EventFormProps) {
       <div className="space-y-3">
         {!showDescriptionInput ? (
           <div 
-            className="flex items-center gap-3 p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
+            className="flex items-center gap-3 p-4 border border-border rounded-lg hover:bg-[#9b6fb5]/5 transition-colors cursor-pointer"
             onClick={() => setShowDescriptionInput(true)}
           >
-            <Edit3 className="w-5 h-5 text-muted-foreground" />
-            <span className="font-medium text-foreground">Add Description</span>
+            <Edit3 className="w-5 h-5 text-[#f47e5c]" />
+            <div>
+              <div className="font-medium text-foreground">Add Event Description</div>
+              <div className="text-sm text-muted-foreground">Tell attendees what your event is about</div>
+            </div>
           </div>
         ) : (
           <div className="space-y-2">
-            <label className="text-sm font-medium">Description</label>
+            <label className="text-sm font-medium">Event Description</label>
             <Textarea
               name="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Tell people what your event is about..."
-              rows={4}
+              placeholder="Describe your event..."
+              className="min-h-[150px]"
             />
           </div>
         )}
       </div>
 
-      {/* Event Options */}
-      <div className="space-y-4">
-        <h3 className="font-semibold text-foreground">Event Options</h3>
-        
-        {/* Tickets */}
-        <div className="flex items-center justify-between p-4 border border-border rounded-lg">
-          <div className="flex items-center gap-3">
-            <Ticket className="w-5 h-5 text-muted-foreground" />
-            <span className="font-medium text-foreground">Tickets</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Select value={ticketType} onValueChange={(value: 'free' | 'paid' | 'donation' | 'rsvp') => setTicketType(value)}>
-              <SelectTrigger className="w-24">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="free">Free</SelectItem>
-                <SelectItem value="paid">Paid</SelectItem>
-                <SelectItem value="donation">Donation</SelectItem>
-                <SelectItem value="rsvp">RSVP</SelectItem>
-              </SelectContent>
-            </Select>
-            {ticketType === 'paid' && (
-              <Input
-                type="number"
-                placeholder="Price"
-                value={ticketPrice || ''}
-                onChange={(e) => setTicketPrice(e.target.value ? parseFloat(e.target.value) : undefined)}
-                className="w-20"
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Require Approval */}
-        <div className="flex items-center justify-between p-4 border border-border rounded-lg">
-          <div className="flex items-center gap-3">
-            <UserCheck className="w-5 h-5 text-muted-foreground" />
-            <span className="font-medium text-foreground">Require Approval</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setRequiresApproval(!requiresApproval)}
-            className={cn(
-              "w-11 h-6 rounded-full relative transition-colors",
-              requiresApproval ? "bg-blue-600" : "bg-gray-300"
-            )}
+      {/* Capacity */}
+      <div className="space-y-3">
+        {!showCapacityInput ? (
+          <div 
+            className="flex items-center gap-3 p-4 border border-border rounded-lg hover:bg-[#9b6fb5]/5 transition-colors cursor-pointer"
+            onClick={() => setShowCapacityInput(true)}
           >
-            <div className={cn(
-              "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform",
-              requiresApproval ? "right-0.5" : "left-0.5"
-            )} />
-          </button>
+            <Users className="w-5 h-5 text-[#9b6fb5]" />
+            <div>
+              <div className="font-medium text-foreground">Set Capacity</div>
+              <div className="text-sm text-muted-foreground">Limit the number of attendees</div>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Maximum Attendees</label>
+            <Input
+              type="number"
+              name="capacity"
+              value={capacity || ''}
+              onChange={(e) => setCapacity(e.target.value ? parseInt(e.target.value) : undefined)}
+              placeholder="Leave blank for unlimited"
+              className="max-w-xs"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Visibility & Approval */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Event Visibility</label>
+          <Select value={visibility} onValueChange={(value: 'public' | 'private' | 'unlisted') => setVisibility(value)}>
+            <SelectTrigger className="border-border focus:ring-[#9b6fb5]/20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="public">Public (Anyone can see)</SelectItem>
+              <SelectItem value="private">Private (Only invitees can see)</SelectItem>
+              <SelectItem value="unlisted">Unlisted (Only accessible via link)</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
-        {/* Capacity */}
-        <div className="flex items-center justify-between p-4 border border-border rounded-lg">
-          <div className="flex items-center gap-3">
-            <Users className="w-5 h-5 text-muted-foreground" />
-            <span className="font-medium text-foreground">Capacity</span>
-          </div>
-          <div className="flex items-center gap-2">
-            {!showCapacityInput ? (
-              <button
-                type="button"
-                onClick={() => setShowCapacityInput(true)}
-                className="text-sm font-medium text-foreground"
-              >
-                Unlimited
-              </button>
-            ) : (
-              <Input
-                type="number"
-                placeholder="100"
-                value={capacity || ''}
-                onChange={(e) => setCapacity(e.target.value ? parseInt(e.target.value) : undefined)}
-                className="w-20"
-              />
-            )}
-          </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Ticket Type</label>
+          <Select value={ticketType} onValueChange={(value: 'free' | 'paid' | 'donation' | 'rsvp') => setTicketType(value)}>
+            <SelectTrigger className="border-border focus:ring-[#9b6fb5]/20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="free">Free</SelectItem>
+              <SelectItem value="paid">Paid</SelectItem>
+              <SelectItem value="donation">Donation-based</SelectItem>
+              <SelectItem value="rsvp">RSVP Only</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
-      {/* Hidden inputs for state-controlled fields */}
-      <input type="hidden" name="visibility" value={visibility} />
+      {/* Ticket Price (if paid) */}
+      {ticketType === 'paid' && (
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Ticket Price (USD)</label>
+          <div className="flex items-center">
+            <span className="text-muted-foreground mr-2">$</span>
+            <Input
+              type="number"
+              name="ticketPrice"
+              value={ticketPrice || ''}
+              onChange={(e) => setTicketPrice(e.target.value ? parseFloat(e.target.value) : undefined)}
+              placeholder="0.00"
+              className="max-w-xs"
+              required
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Hidden fields */}
       <input type="hidden" name="timezone" value={timezone} />
       <input type="hidden" name="eventType" value={eventType} />
-      <input type="hidden" name="requiresApproval" value={requiresApproval.toString()} />
+      <input type="hidden" name="visibility" value={visibility} />
       <input type="hidden" name="ticketType" value={ticketType} />
-      {description && <input type="hidden" name="description" value={description} />}
-      {eventType === 'virtual' && virtualUrl && <input type="hidden" name="virtualUrl" value={virtualUrl} />}
-      {eventType !== 'virtual' && location && <input type="hidden" name="location" value={location} />}
-      {capacity && <input type="hidden" name="capacity" value={capacity.toString()} />}
-      {ticketPrice && <input type="hidden" name="ticketPrice" value={ticketPrice.toString()} />}
+      <input type="hidden" name="requiresApproval" value={requiresApproval.toString()} />
 
-      {/* Create Button */}
-      <Button 
-        type="submit"
-        disabled={isPending || !title || !startDate || !endDate}
-        className="w-full bg-foreground hover:bg-foreground/90 text-background font-medium py-3 h-auto rounded-xl text-base"
-      >
-        {isPending ? "Creating Event..." : "Create Event"}
-      </Button>
+      {/* Submit Button */}
+      <div className="pt-6">
+        <Button 
+          type="submit" 
+          disabled={isPending} 
+          className="w-full sm:w-auto bg-[#e36c89] hover:bg-[#d15e7b] text-white"
+          size="lg"
+        >
+          {isPending ? 'Creating Event...' : 'Create Event'}
+        </Button>
+      </div>
     </form>
   )
 } 

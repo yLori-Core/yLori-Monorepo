@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Github, Mail, ArrowLeft, Clock } from "lucide-react"
+import Image from "next/image"
 
 interface AuthModalProps {
   children: React.ReactNode
@@ -69,8 +70,14 @@ export function AuthModal({ children }: AuthModalProps) {
         <div className="px-8 py-8">
           <DialogHeader className="text-center mb-8">
             <div className="flex justify-center mb-6">
-              <div className="w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-xl">yL</span>
+              <div className="w-16 h-16 relative overflow-hidden">
+                <Image 
+                  src="/logo.png" 
+                  alt="yLori Logo" 
+                  width={64} 
+                  height={64} 
+                  className="object-contain mix-blend-multiply dark:mix-blend-screen"
+                />
               </div>
             </div>
             <DialogTitle className="text-2xl font-display text-foreground">
@@ -87,8 +94,8 @@ export function AuthModal({ children }: AuthModalProps) {
           {showComingSoon ? (
             <div className="space-y-6">
               <div className="text-center">
-                <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Clock className="w-8 h-8 text-amber-600 dark:text-amber-400" />
+                <div className="w-16 h-16 bg-[#f47e5c]/10 dark:bg-[#f47e5c]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Clock className="w-8 h-8 text-[#f47e5c]" />
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">
                   Email magic links are under development. Please use Google or GitHub to sign in.
@@ -97,7 +104,7 @@ export function AuthModal({ children }: AuthModalProps) {
               <Button
                 variant="outline"
                 onClick={() => setAuthMethod('main')}
-                className="w-full border-border hover:bg-accent"
+                className="w-full border-border hover:bg-[#9b6fb5]/10"
               >
                 Try other sign-in methods
               </Button>
@@ -152,11 +159,11 @@ export function AuthModal({ children }: AuthModalProps) {
               <Button
                 onClick={() => setAuthMethod('email')}
                 variant="outline"
-                className="w-full h-12 border-border hover:bg-accent font-medium relative"
+                className="w-full h-12 border-border hover:bg-[#9b6fb5]/10 font-medium relative"
               >
                 <Mail className="w-5 h-5 mr-3" />
                 Continue with Email
-                <span className="absolute -top-1 -right-1 bg-amber-500 text-white text-xs px-1.5 py-0.5 rounded-full font-bold">
+                <span className="absolute -top-1 -right-1 bg-[#f47e5c] text-white text-xs px-1.5 py-0.5 rounded-full font-bold">
                   Soon
                 </span>
               </Button>
@@ -166,7 +173,7 @@ export function AuthModal({ children }: AuthModalProps) {
               <Button
                 variant="ghost"
                 onClick={() => setAuthMethod('main')}
-                className="p-0 h-auto font-medium text-muted-foreground hover:text-foreground"
+                className="p-0 h-auto font-medium text-muted-foreground hover:text-[#9b6fb5]"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
@@ -186,16 +193,16 @@ export function AuthModal({ children }: AuthModalProps) {
                 <Button
                   type="submit"
                   disabled={isLoading || !email}
-                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                  className="w-full h-12 bg-[#e36c89] hover:bg-[#d15e7b] text-white font-medium"
                 >
                   {isLoading ? 'Checking...' : 'Send magic link (Coming Soon)'}
                 </Button>
               </form>
 
-              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
-                                 <p className="text-xs text-amber-700 dark:text-amber-300 text-center">
-                   ⚠️ Email authentication is coming soon! Please use Google or GitHub for now.
-                 </p>
+              <div className="bg-[#f47e5c]/10 border border-[#f47e5c]/20 rounded-lg p-4">
+                <p className="text-xs text-[#f47e5c] text-center">
+                  ⚠️ Email authentication is coming soon! Please use Google or GitHub for now.
+                </p>
               </div>
             </div>
           )}
@@ -203,9 +210,9 @@ export function AuthModal({ children }: AuthModalProps) {
           <div className="mt-8 pt-6 border-t border-border">
             <p className="text-xs text-muted-foreground text-center">
               By continuing, you agree to our{' '}
-              <a href="#" className="underline hover:text-foreground">Terms of Service</a>
+              <a href="#" className="underline hover:text-[#9b6fb5]">Terms of Service</a>
               {' '}and{' '}
-              <a href="#" className="underline hover:text-foreground">Privacy Policy</a>
+              <a href="#" className="underline hover:text-[#e36c89]">Privacy Policy</a>
             </p>
           </div>
         </div>

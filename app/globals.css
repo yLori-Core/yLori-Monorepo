@@ -43,7 +43,13 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* yLori color palette from the logo */
 :root {
+  /* Base colors from the logo */
+  --ylori-purple: #9b6fb5;
+  --ylori-pink: #e36c89;
+  --ylori-orange: #f47e5c;
+  
   --radius: 0.75rem;
   --background: oklch(0.999 0 0);
   --foreground: oklch(0.09 0 0);
@@ -51,65 +57,87 @@
   --card-foreground: oklch(0.09 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.09 0 0);
-  --primary: oklch(0.09 0 0);
-  --primary-foreground: oklch(0.999 0 0);
-  --secondary: oklch(0.975 0 0);
-  --secondary-foreground: oklch(0.09 0 0);
-  --muted: oklch(0.975 0 0);
-  --muted-foreground: oklch(0.45 0 0);
-  --accent: oklch(0.975 0 0);
-  --accent-foreground: oklch(0.09 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0 0);
-  --input: oklch(0.92 0 0);
-  --ring: oklch(0.45 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  
+  /* Primary color - using the pink from the logo */
+  --primary: #e36c89;
+  --primary-foreground: white;
+  
+  /* Secondary color - using the purple from the logo */
+  --secondary: #9b6fb5;
+  --secondary-foreground: white;
+  
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  
+  /* Accent color - using the orange from the logo */
+  --accent: #f47e5c;
+  --accent-foreground: white;
+  
+  --destructive: #ef4444;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #9b6fb5;
+  
+  /* Chart colors based on logo palette */
+  --chart-1: #9b6fb5;
+  --chart-2: #e36c89;
+  --chart-3: #f47e5c;
+  --chart-4: #b85c9e;
+  --chart-5: #dc8674;
+  
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-primary: #9b6fb5;
+  --sidebar-primary-foreground: white;
+  --sidebar-accent: #f4f4f5;
+  --sidebar-accent-foreground: #9b6fb5;
+  --sidebar-border: #e4e4e7;
+  --sidebar-ring: #9b6fb5;
 }
 
 .dark {
-  --background: oklch(0.04 0 0);
-  --foreground: oklch(0.95 0 0);
-  --card: oklch(0.06 0 0);
-  --card-foreground: oklch(0.95 0 0);
-  --popover: oklch(0.06 0 0);
-  --popover-foreground: oklch(0.95 0 0);
-  --primary: oklch(0.95 0 0);
-  --primary-foreground: oklch(0.06 0 0);
-  --secondary: oklch(0.1 0 0);
-  --secondary-foreground: oklch(0.95 0 0);
-  --muted: oklch(0.1 0 0);
-  --muted-foreground: oklch(0.6 0 0);
-  --accent: oklch(0.1 0 0);
-  --accent-foreground: oklch(0.95 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(0.15 0 0);
-  --input: oklch(0.12 0 0);
-  --ring: oklch(0.6 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.06 0 0);
-  --sidebar-foreground: oklch(0.95 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.95 0 0);
-  --sidebar-accent: oklch(0.1 0 0);
-  --sidebar-accent-foreground: oklch(0.95 0 0);
-  --sidebar-border: oklch(0.15 0 0);
-  --sidebar-ring: oklch(0.6 0 0);
+  --background: #0f0f11;
+  --foreground: #f2f2f2;
+  --card: #18181b;
+  --card-foreground: #f2f2f2;
+  --popover: #18181b;
+  --popover-foreground: #f2f2f2;
+  
+  /* Primary color - using the pink from the logo but slightly brighter for dark mode */
+  --primary: #e87c97;
+  --primary-foreground: #0f0f11;
+  
+  /* Secondary color - using the purple from the logo but slightly brighter for dark mode */
+  --secondary: #aa7fc4;
+  --secondary-foreground: #0f0f11;
+  
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  
+  /* Accent color - using the orange from the logo but slightly brighter for dark mode */
+  --accent: #f58e6c;
+  --accent-foreground: #0f0f11;
+  
+  --destructive: #f87171;
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #aa7fc4;
+  
+  /* Chart colors based on logo palette, brighter for dark mode */
+  --chart-1: #aa7fc4;
+  --chart-2: #e87c97;
+  --chart-3: #f58e6c;
+  --chart-4: #c86cae;
+  --chart-5: #ec9684;
+  
+  --sidebar: #18181b;
+  --sidebar-foreground: #f2f2f2;
+  --sidebar-primary: #aa7fc4;
+  --sidebar-primary-foreground: #0f0f11;
+  --sidebar-accent: #27272a;
+  --sidebar-accent-foreground: #aa7fc4;
+  --sidebar-border: #27272a;
+  --sidebar-ring: #aa7fc4;
 }
 
 @layer base {
@@ -150,37 +178,6 @@
     text-wrap: balance;
   }
   
-  /* Landing page animations */
-  .animate-marquee {
-    animation: marquee 60s linear infinite;
-  }
-  
-  /* New marquee implementation */
-  .marquee {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-  }
-  
-  .marquee-track {
-    display: flex;
-    width: fit-content;
-    animation: marquee-animation 40s linear infinite;
-    will-change: transform;
-  }
-  
-  .marquee:hover .marquee-track {
-    animation-play-state: paused;
-  }
-  
-  .marquee-item {
-    flex-shrink: 0;
-    padding: 0 3rem;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-  }
-  
   .animate-float {
     animation: float 8s ease-in-out infinite;
   }
@@ -191,24 +188,6 @@
   
   .transform-style-3d {
     transform-style: preserve-3d;
-  }
-}
-
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes marquee-animation {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
   }
 }
 

@@ -29,27 +29,27 @@ export async function Navbar() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex justify-between items-center h-14">
           <div className="flex items-center space-x-8">
-            <Link href="/" className="flex items-center space-x-2">
+            <Link href="/" className="flex items-center">
               <Image 
-                src="/logo.png" 
+                src="/logo_full.png" 
                 alt="yLori Logo" 
-                width={24} 
-                height={24} 
-                className="w-6 h-6 object-contain"
+                width={100} 
+                height={32} 
+                className="h-8 w-auto object-contain mix-blend-multiply dark:mix-blend-screen"
+                priority
               />
-              <span className="text-lg font-semibold text-foreground">yLori</span>
             </Link>
             
             <div className="hidden md:flex items-center space-x-1">
-              <Link href="#" className="flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium text-foreground bg-accent/60">
-                <Calendar className="w-4 h-4" />
+              <Link href="#" className="flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium text-foreground bg-[#9b6fb5]/10">
+                <Calendar className="w-4 h-4 text-[#9b6fb5]" />
                 <span>Events</span>
               </Link>
-              <Link href="#" className="flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/40 transition-all">
+              <Link href="#" className="flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground hover:text-[#e36c89] hover:bg-[#e36c89]/10 transition-all">
                 <Calendar className="w-4 h-4" />
                 <span>Calendars</span>
               </Link>
-              <Link href="#" className="flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/40 transition-all">
+              <Link href="#" className="flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground hover:text-[#f47e5c] hover:bg-[#f47e5c]/10 transition-all">
                 <Globe className="w-4 h-4" />
                 <span>Discover</span>
               </Link>
@@ -62,7 +62,7 @@ export async function Navbar() {
             </span>
             
             <Button 
-              className="bg-foreground hover:bg-foreground/90 text-background font-medium px-4 py-2 h-9 text-sm shadow-sm"
+              className="bg-[#e36c89] hover:bg-[#d15e7b] text-white font-medium px-4 py-2 h-9 text-sm shadow-sm"
               asChild
             >
               <Link href="/create">
@@ -70,13 +70,13 @@ export async function Navbar() {
               </Link>
             </Button>
             
-            <Button variant="ghost" size="sm" className="w-9 h-9 p-0 hover:bg-accent/60 text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" size="sm" className="w-9 h-9 p-0 hover:bg-[#9b6fb5]/10 text-muted-foreground hover:text-[#9b6fb5]">
               <Search className="w-4 h-4" />
             </Button>
             
-            <Button variant="ghost" size="sm" className="relative w-9 h-9 p-0 hover:bg-accent/60 text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" size="sm" className="relative w-9 h-9 p-0 hover:bg-[#e36c89]/10 text-muted-foreground hover:text-[#e36c89]">
               <Bell className="w-4 h-4" />
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full"></span>
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#f47e5c] rounded-full"></span>
             </Button>
             
             <ThemeToggle />
@@ -86,9 +86,9 @@ export async function Navbar() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="relative w-8 h-8 rounded-full">
-                    <Avatar className="w-8 h-8">
+                    <Avatar className="w-8 h-8 ring-2 ring-[#9b6fb5]/20">
                       <AvatarImage src={session.user.image || ""} alt={session.user.name || ""} />
-                      <AvatarFallback className="text-xs">
+                      <AvatarFallback className="text-xs bg-[#9b6fb5]/20 text-[#9b6fb5]">
                         {session.user.name?.charAt(0) || session.user.email?.charAt(0) || "U"}
                       </AvatarFallback>
                     </Avatar>
@@ -107,7 +107,7 @@ export async function Navbar() {
                   <DropdownMenuItem asChild>
                     <Link 
                       href={`/user/${(session.user as any).username || 'profile'}`}
-                      className="flex items-center w-full hover:bg-accent focus:bg-accent text-foreground hover:text-foreground"
+                      className="flex items-center w-full hover:bg-[#9b6fb5]/10 focus:bg-[#9b6fb5]/10 text-foreground hover:text-[#9b6fb5]"
                     >
                       <User className="mr-2 h-4 w-4" />
                       Profile
@@ -120,7 +120,7 @@ export async function Navbar() {
               </DropdownMenu>
             ) : (
               <AuthModal>
-                <Button className="bg-foreground hover:bg-foreground/90 text-background font-medium px-4 py-2 h-9 text-sm shadow-sm">
+                <Button className="bg-[#9b6fb5] hover:bg-[#8a5ea4] text-white font-medium px-4 py-2 h-9 text-sm shadow-sm">
                   Sign in
                 </Button>
               </AuthModal>
