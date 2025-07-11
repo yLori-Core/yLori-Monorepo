@@ -117,8 +117,8 @@ export default function LandingPage() {
                   </Link>
                 </Button>
                 {/* Explore events button removed on mobile, shown on larger screens */}
-                <Button size="lg" variant="outline" className="hidden sm:flex border-border hover:bg-accent/10 text-base h-11 px-6 rounded-lg sm:w-auto ml-4">
-                  Explore events
+                <Button size="lg" variant="outline" className="hidden sm:flex border-border hover:bg-accent/10 text-base h-11 px-6 rounded-lg sm:w-auto ml-4" asChild>
+                  <Link href="/events">Explore events</Link>
                 </Button>
               </div>
               

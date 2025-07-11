@@ -483,6 +483,15 @@ export async function registerForEvent(eventId: string, guestData?: {
   };
   
   const result = await db.insert(eventAttendees).values(attendeeData).returning();
+  
+  // Update the total registrations count in the events table
+  await db.update(events)
+    .set({ 
+      totalRegistrations: sql`${events.totalRegistrations} + 1`,
+      updatedAt: new Date()
+    })
+    .where(eq(events.id, eventId));
+  
   return result[0];
 }
 
@@ -579,6 +588,17 @@ export async function approveAttendee(eventId: string, attendeeId: string) {
       eq(eventAttendees.eventId, eventId)
     ))
     .returning();
+  
+  // Update total registrations count (only if coming from pending status)
+  if (attendee[0].status === 'pending') {
+    await db.update(events)
+      .set({ 
+        totalRegistrations: sql`${events.totalRegistrations} + 1`,
+        updatedAt: new Date()
+      })
+      .where(eq(events.id, eventId));
+  }
+  
   return result[0];
 }
 
@@ -778,32 +798,39 @@ export async function getUserStats(userId: string) {
   };
 }
 
-export async function getUserProfileData(username: string) {
+export async function getUserProfileData(username: string, viewerId?: string) {
   // Get user by username
-  const user = await getUserByUsername(username);
+  const user = await getUserByUsername(username)
   if (!user) {
-    return null;
+    return null
   }
 
   // Get user stats
-  const stats = await getUserStats(user.id);
+  const stats = await getUserStats(user.id)
 
-  // Get user's public events (only published and public events)
-  const userEvents = await db.select()
+  // Get user's events based on viewer
+  const isOwner = viewerId && viewerId === user.id
+  const eventWhere = isOwner 
+    ? and(eq(events.createdById, user.id))
+    : and(
+        eq(events.createdById, user.id),
+        eq(events.status, 'published'),
+        eq(events.visibility, 'public')
+      )
+  
+  // Build query with conditional limit
+  const baseQuery = db.select()
     .from(events)
-    .where(and(
-      eq(events.createdById, user.id),
-      eq(events.status, 'published'),
-      eq(events.visibility, 'public')
-    ))
+    .where(eventWhere)
     .orderBy(desc(events.startDate))
-    .limit(10);
+  
+  const userEvents = await (isOwner ? baseQuery : baseQuery.limit(10))
 
   return {
     user,
     stats,
     events: userEvents
-  };
+  }
 }
 
 // Event dashboard data
@@ -837,4 +864,20 @@ export async function getEventDashboardData(eventId: string) {
     },
     recentRegistrations
   };
+} 
+
+export async function searchUsers(query: string) {
+  return await db.select({
+    id: users.id,
+    name: users.name,
+    username: users.username,
+    image: users.image,
+  })
+  .from(users)
+  .where(or(
+    sql`${users.name} ILIKE ${'%' + query + '%'}` ,
+    sql`${users.username} ILIKE ${'%' + query + '%'}`,
+    sql`${users.email} ILIKE ${'%' + query + '%'} `
+  ))
+  .limit(10);
 } 

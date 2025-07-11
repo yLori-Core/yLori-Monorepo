@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { Clock } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import {
   Select,
   SelectContent,
@@ -10,11 +9,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { cn } from "@/lib/utils"
 
 interface TimePickerProps {
-  value?: string
+  value?: string | undefined
   onChange?: (time: string) => void
   className?: string
+  placeholder?: string
 }
 
 // Generate time options (12-hour format with AM/PM)
@@ -22,7 +23,7 @@ const generateTimeOptions = () => {
   const times: { value: string; label: string }[] = []
   
   for (let hour = 0; hour < 24; hour++) {
-    for (let minute = 0; minute < 60; minute += 15) { // 15-minute intervals
+    for (let minute = 0; minute < 60; minute += 30) { // 30-minute intervals for cleaner UI
       const hour24 = hour
       const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour
       const ampm = hour < 12 ? 'AM' : 'PM'
@@ -49,20 +50,47 @@ const formatTimeForDisplay = (time24: string) => {
   return `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`
 }
 
-export function TimePicker({ value = "14:00", onChange, className }: TimePickerProps) {
+export function TimePicker({ 
+  value = undefined, 
+  onChange, 
+  className,
+  placeholder = "Select time"
+}: TimePickerProps) {
+  const [open, setOpen] = React.useState(false)
+  
   return (
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className={`justify-start text-sm font-medium ${className}`}>
-        <div className="flex items-center gap-2">
-          <Clock className="h-4 w-4 text-muted-foreground" />
-          <SelectValue>
-            {value ? formatTimeForDisplay(value) : "Select time"}
-          </SelectValue>
+    <Select 
+      value={value} 
+      onValueChange={(val) => {
+        onChange?.(val);
+        setOpen(false);
+      }} 
+      open={open} 
+      onOpenChange={setOpen}
+    >
+      <SelectTrigger 
+        className={cn(
+          "h-full text-left font-normal text-white",
+          !value && "text-gray-400 hover:text-gray-200",
+          className
+        )}
+      >
+        <div className="flex items-center flex-1">
+          <Clock className="mr-2 h-5 w-5 opacity-70" />
+          <span>{value ? formatTimeForDisplay(value) : placeholder}</span>
         </div>
       </SelectTrigger>
-      <SelectContent className="max-h-60">
+      <SelectContent 
+        className="max-h-[300px] w-[160px] bg-black/90"
+        position="popper"
+        sideOffset={4}
+      >
         {timeOptions.map((time) => (
-          <SelectItem key={time.value} value={time.value} className="text-sm">
+          <SelectItem 
+            key={time.value} 
+            value={time.value} 
+            className="text-sm cursor-pointer text-white hover:bg-black/50"
+          >
             {time.label}
           </SelectItem>
         ))}

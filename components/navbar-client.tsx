@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Calendar, Search, Bell, Globe, User, Plus } from "lucide-react";
+import { Calendar, Search, Bell, Globe, User } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { AuthModal } from "@/components/auth-modal";
 import { SignOutButton } from "@/components/sign-out-button";
@@ -88,7 +88,7 @@ export function NavbarClient({ session }: NavbarClientProps) {
             </Link>
             
             <div className="hidden md:flex items-center ml-8 space-x-1">
-              <Link href="#" className="flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium text-foreground bg-[#9b6fb5]/10">
+              <Link href="/events" className="flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium text-foreground bg-[#9b6fb5]/10">
                 <Calendar className="w-4 h-4 text-[#9b6fb5]" />
                 <span>Events</span>
               </Link>
@@ -109,17 +109,7 @@ export function NavbarClient({ session }: NavbarClientProps) {
               {currentTime}
             </span>
             
-            <div className="hidden sm:block">
-              <Button 
-                className="bg-[#e36c89] hover:bg-[#d15e7b] text-white font-medium px-3 sm:px-4 py-2 h-9 text-sm shadow-sm"
-                asChild
-              >
-                <Link href="/create">
-                  <span className="hidden sm:inline">Create Event</span>
-                  <span className="sm:hidden">Create</span>
-                </Link>
-              </Button>
-            </div>
+
             
             <div className="hidden sm:flex items-center space-x-2">
               <Button variant="ghost" size="sm" className="w-9 h-9 p-0 hover:bg-[#9b6fb5]/10 text-muted-foreground hover:text-[#9b6fb5]">
@@ -223,7 +213,7 @@ export function NavbarClient({ session }: NavbarClientProps) {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link 
-                        href="#" 
+                        href="/events" 
                         className="flex items-center w-full hover:bg-[#9b6fb5]/10 focus:bg-[#9b6fb5]/10 text-foreground hover:text-[#9b6fb5]"
                       >
                         <Calendar className="mr-2 h-4 w-4 text-[#9b6fb5]" />
@@ -246,16 +236,6 @@ export function NavbarClient({ session }: NavbarClientProps) {
                       >
                         <Globe className="mr-2 h-4 w-4" />
                         Discover
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link 
-                        href="/create" 
-                        className="flex items-center w-full text-[#e36c89] hover:bg-[#e36c89]/10 focus:bg-[#e36c89]/10"
-                      >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Create Event
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />

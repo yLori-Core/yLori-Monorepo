@@ -21,6 +21,9 @@ const createEventSchema = z.object({
   ticketType: z.enum(['free', 'paid', 'donation', 'rsvp']).default('free'),
   ticketPrice: z.number().positive().optional(),
   currency: z.string().default('USD'),
+  coverImage: z.string().optional(),
+  bannerImage: z.string().optional(),
+  logoImage: z.string().optional(),
 })
 
 export type CreateEventFormData = z.infer<typeof createEventSchema>
@@ -43,6 +46,9 @@ export async function createEventAction(formData: FormData) {
       ticketType: formData.get('ticketType') as 'free' | 'paid' | 'donation' | 'rsvp',
       ticketPrice: formData.get('ticketPrice') ? parseFloat(formData.get('ticketPrice') as string) : undefined,
       currency: formData.get('currency') as string || 'USD',
+      coverImage: formData.get('coverImage') ? (formData.get('coverImage') as string) : undefined,
+      bannerImage: formData.get('bannerImage') ? (formData.get('bannerImage') as string) : undefined,
+      logoImage: formData.get('logoImage') ? (formData.get('logoImage') as string) : undefined,
     }
 
     // Validate the data
@@ -82,6 +88,9 @@ export async function createEventAction(formData: FormData) {
       ticketType: validatedData.ticketType,
       ticketPrice: validatedData.ticketPrice ? validatedData.ticketPrice.toString() : null,
       currency: validatedData.currency,
+      coverImage: validatedData.coverImage || null,
+      bannerImage: validatedData.bannerImage || null,
+      logoImage: validatedData.logoImage || null,
       slug,
       status: 'draft' as const,
       theme: 'minimal',
