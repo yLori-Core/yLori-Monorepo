@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Link from "next/link"
 import Image from "next/image"
 import { Calendar, MapPin, Users, Clock, Search, Plus } from "lucide-react"
+import { AvatarCircles } from "@/components/ui/avatar-circles"
 
 interface Event {
   id: string
@@ -18,7 +19,7 @@ interface Event {
   endDate: Date
   location: string | null
   eventType: 'in_person' | 'virtual' | 'hybrid'
-  ticketType: 'free' | 'paid' | 'donation' | 'rsvp' | null
+  ticketType: 'qr_code' | 'nft' | null
   totalRegistrations: number | null
   coverImage: string | null
   slug: string | null
@@ -92,6 +93,23 @@ export function EventsClient({ allEvents, upcomingEvents }: EventsClientProps) {
     }
   }
 
+  // Generate dummy avatar URLs for demonstration
+  const generateAvatarUrls = (count: number) => {
+    const baseUrls = [
+      "https://avatars.githubusercontent.com/u/16860528",
+      "https://avatars.githubusercontent.com/u/20110627",
+      "https://avatars.githubusercontent.com/u/106103625",
+      "https://avatars.githubusercontent.com/u/59228569",
+      "https://avatars.githubusercontent.com/u/1",
+      "https://avatars.githubusercontent.com/u/2",
+      "https://avatars.githubusercontent.com/u/3",
+      "https://avatars.githubusercontent.com/u/4",
+    ]
+    
+    const displayCount = Math.min(count, 4) // Show max 4 avatars
+    return baseUrls.slice(0, displayCount)
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
       {/* Header */}
@@ -162,12 +180,12 @@ export function EventsClient({ allEvents, upcomingEvents }: EventsClientProps) {
 
       {/* Events Grid */}
       {filteredEvents.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredEvents.map((event) => {
             const startDate = new Date(event.startDate)
             
             return (
-              <Card key={event.id} className="group hover:shadow-lg transition-all duration-200 border-border/50 hover:border-border overflow-hidden">
+              <Card key={event.id} className="group hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 border-0 bg-card/50 backdrop-blur-sm overflow-hidden hover:-translate-y-1 p-0 gap-0">
                 {/* Event Image */}
                 {event.coverImage && (
                   <div className="relative h-48 overflow-hidden">
@@ -175,88 +193,135 @@ export function EventsClient({ allEvents, upcomingEvents }: EventsClientProps) {
                       src={event.coverImage}
                       alt={event.title}
                       fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
-                    <div className="absolute top-3 right-3">
-                      {getStatusBadge(startDate)}
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                    
+                    {/* Status Badge */}
+                    <div className="absolute top-4 right-4 z-10">
+                      <div className="bg-black/20 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-xs font-medium border border-white/10">
+                        {startDate > new Date() ? 'Upcoming' : 'Past'}
+                      </div>
+                    </div>
+                    
+                    {/* NFT Badge - Only for NFT tickets */}
+                    {event.ticketType === 'nft' && (
+                      <div className="absolute top-4 left-4 z-10">
+                        <div className="bg-black/30 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-xs font-medium border border-white/10 flex items-center gap-1.5">
+                          <div className="w-1.5 h-1.5 bg-purple-400 rounded-full" />
+                          NFT Tickets
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* QR Code Badge - Subtle for QR tickets */}
+                    {event.ticketType === 'qr_code' && (
+                      <div className="absolute top-4 left-4 z-10">
+                        <div className="bg-black/20 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-xs font-medium border border-white/10">
+                          QR
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Title overlay on image */}
+                    <div className="absolute bottom-4 left-4 right-4 z-10">
+                      <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 drop-shadow-lg">
+                        {event.title}
+                      </h3>
                     </div>
                   </div>
                 )}
                 
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-foreground line-clamp-2 leading-tight group-hover:text-[#e36c89] transition-colors">
-                        {event.title}
-                      </h3>
-                      {!event.coverImage && (
-                        <div className="mt-2">
-                          {getStatusBadge(startDate)}
-                        </div>
-                      )}
+                {/* Content - No header needed since title is on image */}
+                <div className="p-6 space-y-4">
+                  {/* If no image, show title here */}
+                  {!event.coverImage && (
+                    <div className="space-y-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="font-bold text-lg text-foreground line-clamp-2 leading-tight group-hover:text-primary transition-colors">
+                          {event.title}
+                        </h3>
+                        {/* Ticket type badge for no-image cards */}
+                        {event.ticketType === 'nft' && (
+                          <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-md text-xs font-semibold flex items-center gap-1 shrink-0">
+                            <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                            NFT Tickets
+                          </div>
+                        )}
+                        {event.ticketType === 'qr_code' && (
+                          <div className="bg-muted text-muted-foreground px-2 py-1 rounded-md text-xs font-medium shrink-0">
+                            QR
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {getStatusBadge(startDate)}
+                      </div>
                     </div>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="pt-0 space-y-3">
+                  )}
+                  
                   {/* Date & Time */}
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Calendar className="w-4 h-4" />
-                    <span>{formatDate(startDate)} • {formatTime(startDate)}</span>
+                    <Calendar className="w-4 h-4 text-primary" />
+                    <span className="font-medium">{formatDate(startDate)} • {formatTime(startDate)}</span>
                   </div>
                   
                   {/* Location */}
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     {event.eventType === 'virtual' ? (
                       <>
-                        <Clock className="w-4 h-4" />
-                        <span>Virtual Event</span>
+                        <Clock className="w-4 h-4 text-primary" />
+                        <span className="font-medium">Virtual Event</span>
                       </>
                     ) : (
                       <>
-                        <MapPin className="w-4 h-4" />
-                        <span className="line-clamp-1">
+                        <MapPin className="w-4 h-4 text-primary" />
+                        <span className="line-clamp-1 font-medium">
                           {event.location || 'Location TBA'}
                         </span>
                       </>
                     )}
                   </div>
                   
-                  {/* Event Type Badge */}
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="capitalize">
-                      {event.eventType?.replace('_', ' ')}
-                    </Badge>
-                    {event.ticketType && (
-                      <Badge variant="outline" className="capitalize">
-                        {event.ticketType}
-                      </Badge>
-                    )}
-                  </div>
-                  
                   {/* Description */}
                   {event.description && (
-                    <p className="text-sm text-muted-foreground line-clamp-2">
+                    <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
                       {event.description}
                     </p>
                   )}
                   
-                  {/* Attendees Count */}
-                  {event.totalRegistrations && event.totalRegistrations > 0 && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Users className="w-4 h-4" />
-                      <span>{event.totalRegistrations} registered</span>
-                    </div>
-                  )}
-                  
-                  {/* View Event Button */}
-                  <Button asChild className="w-full mt-4">
-                    <Link href={`/event/${event.slug || event.id}`}>
-                      View Event
-                    </Link>
-                  </Button>
-                </CardContent>
+                  {/* Bottom section with attendees and button */}
+                  <div className="flex items-center justify-between pt-2">
+                    {/* Attendees Count with Avatar Circles */}
+                    {event.totalRegistrations && event.totalRegistrations > 0 ? (
+                      <div className="flex items-center gap-3">
+                        <AvatarCircles 
+                          className="scale-75" 
+                          numPeople={event.totalRegistrations > 4 ? event.totalRegistrations - 4 : undefined}
+                          avatarUrls={generateAvatarUrls(event.totalRegistrations)}
+                        />
+                        <div className="text-sm text-muted-foreground">
+                          <span className="font-medium">{event.totalRegistrations} approved</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="capitalize text-xs">
+                          {event.eventType?.replace('_', ' ')}
+                        </Badge>
+                      </div>
+                    )}
+                    
+                    {/* View Event Button */}
+                    <Button asChild size="sm" className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-md hover:shadow-lg transition-all duration-200">
+                      <Link href={`/events/${event.slug || event.id}`}>
+                        View Event
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
               </Card>
             )
           })}

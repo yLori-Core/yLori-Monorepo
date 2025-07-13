@@ -23,7 +23,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ us
     notFound()
   }
   
-  const { user, stats, events } = profileData
+  const { user, stats, events, registeredEvents } = profileData
   const isOwner = viewerId === user.id
 
   // Group events if owner
@@ -188,6 +188,86 @@ export default async function UserProfilePage({ params }: { params: Promise<{ us
         <div className="space-y-8">
           {isOwner ? (
             <>
+              {/* Registered Events - Only visible to profile owner */}
+              {registeredEvents && registeredEvents.length > 0 && (
+                <div>
+                  <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
+                    <Users className="w-6 h-6" />
+                    Registered Events
+                  </h2>
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {registeredEvents.map(({ event, attendee }) => {
+                      const isUpcoming = new Date(event.startDate) > new Date()
+                      const statusColors = {
+                        'pending': 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20',
+                        'approved': 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20',
+                        'waitlisted': 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20',
+                        'checked_in': 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+                        'declined': 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
+                        'cancelled': 'bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20',
+                        'no_show': 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20'
+                      }
+                      
+                      return (
+                        <Card key={event.id} className={`group hover:shadow-lg transition-all duration-200 border-border/50 hover:border-border overflow-hidden ${!isUpcoming ? 'opacity-75' : ''}`}>
+                          <Link href={`/events/${event.slug}`}>
+                            {event.coverImage && (
+                              <div className="w-full h-32 bg-muted overflow-hidden">
+                                <Image 
+                                  src={event.coverImage} 
+                                  alt={event.title}
+                                  width={300}
+                                  height={128}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                              </div>
+                            )}
+                            <CardHeader className="pb-3">
+                              <div className="flex items-start justify-between gap-2">
+                                <h3 className="font-semibold text-foreground line-clamp-2 leading-tight group-hover:text-primary transition-colors flex-1">{event.title}</h3>
+                                <Badge className={statusColors[attendee.status] || statusColors.pending}>
+                                  {attendee.status.charAt(0).toUpperCase() + attendee.status.slice(1).replace('_', ' ')}
+                                </Badge>
+                              </div>
+                              {event.summary && (
+                                <p className="text-sm text-muted-foreground line-clamp-2 mt-2">{event.summary}</p>
+                              )}
+                            </CardHeader>
+                            <CardContent className="pt-0 space-y-2">
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <Calendar className="w-3 h-3" />
+                                <span>
+                                  {new Intl.DateTimeFormat('en-US', { 
+                                    month: 'short', 
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                  }).format(new Date(event.startDate))}
+                                </span>
+                              </div>
+                              {event.location && (
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <MapPin className="w-3 h-3" />
+                                  <span className="truncate">{event.location}</span>
+                                </div>
+                              )}
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <Clock className="w-3 h-3" />
+                                <span>
+                                  Registered {new Intl.DateTimeFormat('en-US', { 
+                                    month: 'short', 
+                                    day: 'numeric'
+                                  }).format(new Date(attendee.registeredAt))}
+                                </span>
+                              </div>
+                            </CardContent>
+                          </Link>
+                        </Card>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
               {drafts.length > 0 && (
                 <div>
                   <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
@@ -206,7 +286,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ us
                               Draft
                             </Badge>
                             <Button asChild size="sm" variant="outline" className="ml-auto">
-                              <Link href={`/event/${event.slug}?edit=true`} className="flex items-center gap-2">
+                              <Link href={`/events/${event.slug}?edit=true`} className="flex items-center gap-2">
                                 <Edit className="w-4 h-4" />
                                 Edit
                               </Link>
@@ -233,7 +313,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ us
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {upcoming.map((event) => (
                       <Card key={event.id} className="group hover:shadow-lg transition-all duration-200 border-border/50 hover:border-border overflow-hidden">
-                        <Link href={`/event/${event.slug}`}>
+                        <Link href={`/events/${event.slug}`}>
                           {event.coverImage && (
                             <div className="w-full h-32 bg-muted overflow-hidden">
                               <Image 
@@ -285,7 +365,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ us
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {past.map((event) => (
                       <Card key={event.id} className="group hover:shadow-lg transition-all duration-200 border-border/50 hover:border-border overflow-hidden opacity-75 hover:opacity-100">
-                        <Link href={`/event/${event.slug}`}>
+                        <Link href={`/events/${event.slug}`}>
                           {event.coverImage && (
                             <div className="w-full h-32 bg-muted overflow-hidden">
                               <Image 
@@ -366,7 +446,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ us
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {events.map((event) => (
                     <Card key={event.id} className="group hover:shadow-lg transition-all duration-200 border-border/50 hover:border-border overflow-hidden">
-                      <Link href={`/event/${event.slug}`}>
+                      <Link href={`/events/${event.slug}`}>
                         {event.coverImage && (
                           <div className="w-full h-32 bg-muted overflow-hidden">
                             <Image 

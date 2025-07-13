@@ -11,7 +11,7 @@ import { format } from "date-fns"
 import { CalendarIcon, MapPin, Edit3, Users, Ticket, UserCheck, Clock, Globe } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { createEventAction } from "@/app/create/actions"
-import { updateEventAction } from "@/app/event/actions"
+import { updateEventAction } from "@/app/events/actions"
 import { DateTimePicker } from "@/components/date-time-picker"
 import { ImageUpload } from "@/components/image-upload"
 
@@ -30,7 +30,7 @@ interface EventData {
   capacity?: number | null;
   requiresApproval?: boolean | null;
   visibility?: 'public' | 'private' | 'unlisted' | null;
-  ticketType?: 'free' | 'paid' | 'donation' | 'rsvp' | null;
+  ticketType?: 'qr_code' | 'nft' | null;
   ticketPrice?: number | string | null;
   currency?: string | null;
   coverImage?: string | null;
@@ -73,9 +73,9 @@ export function EventForm({ initialData = {} }: EventFormProps) {
   const [location, setLocation] = useState(initialData.location || "")
   const [virtualUrl, setVirtualUrl] = useState(initialData.virtualUrl || "")
   const [capacity, setCapacity] = useState<number | undefined>(initialData.capacity || undefined)
-  const [requiresApproval, setRequiresApproval] = useState(initialData.requiresApproval || false)
+  const [requiresApproval, setRequiresApproval] = useState(initialData.requiresApproval !== undefined ? initialData.requiresApproval : true)
   const [visibility, setVisibility] = useState(initialData.visibility || 'public')
-  const [ticketType, setTicketType] = useState(initialData.ticketType || 'free')
+  const [ticketType, setTicketType] = useState(initialData.ticketType || 'qr_code')
   const [ticketPrice, setTicketPrice] = useState<number | undefined>(
     typeof initialData.ticketPrice === 'number' ? initialData.ticketPrice :
     typeof initialData.ticketPrice === 'string' ? parseFloat(initialData.ticketPrice) || undefined :
@@ -126,10 +126,7 @@ export function EventForm({ initialData = {} }: EventFormProps) {
       }
     }
     
-    // Validate ticket price if paid
-    if (ticketType === 'paid' && (ticketPrice === undefined || ticketPrice <= 0)) {
-      newErrors.ticketPrice = "Please enter a valid price greater than 0";
-    }
+
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -180,7 +177,7 @@ export function EventForm({ initialData = {} }: EventFormProps) {
           }
           
           if (slug) {
-            window.location.href = `/event/${slug}`;
+            window.location.href = `/events/${slug}`;
           }
         } else {
           setFormError(result.error || 'Failed to create event');
@@ -427,78 +424,30 @@ export function EventForm({ initialData = {} }: EventFormProps) {
         )}
       </div>
 
-      {/* Visibility & Approval */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Event Visibility</label>
-          <Select value={visibility || 'public'} onValueChange={(value: 'public' | 'private' | 'unlisted') => setVisibility(value)}>
-            <SelectTrigger className="border-border focus:ring-[#9b6fb5]/20">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="public">Public</SelectItem>
-              <SelectItem value="private">Private</SelectItem>
-              <SelectItem value="unlisted">Unlisted</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Ticket Type</label>
-          <Select value={ticketType || 'free'} onValueChange={(value: 'free' | 'paid' | 'donation' | 'rsvp') => {
-            setTicketType(value);
-            if (value !== 'paid') {
-              setTicketPrice(undefined);
-              setErrors(prev => ({...prev, ticketPrice: undefined}));
-            }
-          }}>
-            <SelectTrigger className="border-border focus:ring-[#9b6fb5]/20">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="free">Free</SelectItem>
-              <SelectItem value="paid">Paid</SelectItem>
-              <SelectItem value="donation">Donation-based</SelectItem>
-              <SelectItem value="rsvp">RSVP Only</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      {/* Ticket Type */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Ticket Type</label>
+        <Select value={ticketType || 'qr_code'} onValueChange={(value: 'qr_code' | 'nft') => {
+          setTicketType(value);
+        }}>
+          <SelectTrigger className="border-border focus:ring-[#9b6fb5]/20">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="qr_code">QR Code Ticket</SelectItem>
+            <SelectItem value="nft">NFT Ticket</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
-      {/* Ticket Price (if paid) */}
-      {ticketType === 'paid' && (
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Ticket Price (USD)</label>
-          <div className="flex items-center">
-            <span className="text-muted-foreground mr-2">$</span>
-            <Input
-              type="number"
-              name="ticketPrice"
-              value={ticketPrice || ''}
-              onChange={(e) => {
-                const value = e.target.value ? parseFloat(e.target.value) : undefined;
-                setTicketPrice(value);
-                if (value && value > 0) {
-                  setErrors(prev => ({...prev, ticketPrice: undefined}));
-                }
-              }}
-              placeholder="0.00"
-              className="max-w-xs"
-              required
-            />
-          </div>
-          {errors.ticketPrice && (
-            <div className="text-red-500 text-sm mt-1">{errors.ticketPrice}</div>
-          )}
-        </div>
-      )}
+
 
       {/* Hidden fields */}
       <input type="hidden" name="timezone" value={timezone} />
       <input type="hidden" name="eventType" value={eventType} />
       <input type="hidden" name="visibility" value={visibility} />
       <input type="hidden" name="ticketType" value={ticketType} />
-      <input type="hidden" name="requiresApproval" value={requiresApproval.toString()} />
+      <input type="hidden" name="requiresApproval" value={requiresApproval?.toString() ?? 'true'} />
 
       {/* Submit Button */}
       <div className="pt-6">

@@ -20,7 +20,7 @@ const eventSchema = z.object({
   capacity: z.number().positive().optional(),
   requiresApproval: z.boolean(),
   visibility: z.enum(['public', 'private', 'unlisted']),
-  ticketType: z.enum(['free', 'paid', 'donation', 'rsvp']),
+  ticketType: z.enum(['qr_code', 'nft']),
   ticketPrice: z.number().positive().optional(),
   currency: z.string().optional(),
   coverImage: z.string().optional(),
@@ -81,7 +81,7 @@ export async function updateEventAction(eventId: string, formData: any) {
     
     const event = await updateEvent(eventId, updateData)
     
-    revalidatePath(`/event/${event.slug}`)
+    revalidatePath(`/events/${event.slug}`)
     revalidatePath('/user/[username]', 'page')
     
     return { success: true, event }
@@ -98,7 +98,7 @@ export async function publishEventAction(eventId: string) {
       publishedAt: new Date()
     })
     
-    revalidatePath(`/event/${event.slug}`)
+    revalidatePath(`/events/${event.slug}`)
     revalidatePath('/user/[username]', 'page')
     
     return { success: true, event }
@@ -124,7 +124,7 @@ export async function registerForEventAction(eventId: string) {
     
     const registration = await registerForEvent(eventId)
     
-    revalidatePath(`/event/[slug]`, 'page')
+    revalidatePath(`/events/[slug]`, 'page')
     
     return { success: true, registration }
   } catch (error) {

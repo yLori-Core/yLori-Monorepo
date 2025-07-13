@@ -18,14 +18,16 @@ import {
   UserCheck, 
   AlertCircle,
   MoreVertical,
-  MessageSquare
+  MessageSquare,
+  Users,
+  Calendar
 } from "lucide-react"
 import { 
   approveAttendeeAction, 
   declineAttendeeAction, 
   moveToWaitlistAction, 
   checkInAttendeeAction 
-} from "@/app/event/[slug]/manage/actions"
+} from "@/app/events/[slug]/manage/actions"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 interface Attendee {
@@ -180,88 +182,129 @@ export function AttendeeManagement({ eventId, requiresApproval }: AttendeeManage
     )
   }
 
-  const AttendeeCard = ({ attendee }: { attendee: Attendee }) => {
+    const AttendeeCard = ({ attendee }: { attendee: Attendee }) => {
     const displayName = attendee.user?.name || attendee.guestName || "Unknown"
     const displayEmail = attendee.user?.email || attendee.guestEmail || ""
     const displayCompany = attendee.user?.company || ""
     const displayJob = attendee.user?.jobTitle || ""
 
     return (
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={attendee.user?.image || ""} />
-              <AvatarFallback>
-                {displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
-              </AvatarFallback>
-            </Avatar>
-            
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <h4 className="font-medium">{displayName}</h4>
-                {attendee.isVip && <Badge variant="outline" className="text-xs">VIP</Badge>}
+      <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-card/50 backdrop-blur-sm">
+        <div className="p-6">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-4 flex-1">
+              <div className="relative">
+                <Avatar className="h-12 w-12 ring-2 ring-background shadow-sm">
+                  <AvatarImage src={attendee.user?.image || ""} />
+                  <AvatarFallback className="bg-gradient-to-br from-primary/10 to-primary/5 text-primary font-semibold">
+                    {displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                  </AvatarFallback>
+                </Avatar>
+                {attendee.isVip && (
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full flex items-center justify-center">
+                    <span className="text-xs font-bold text-white">★</span>
+                  </div>
+                )}
               </div>
-              <p className="text-sm text-muted-foreground">{displayEmail}</p>
-              {displayCompany && (
-                <p className="text-xs text-muted-foreground">
-                  {displayJob ? `${displayJob} at ${displayCompany}` : displayCompany}
-                </p>
-              )}
-              <p className="text-xs text-muted-foreground">
-                Registered: {new Date(attendee.registeredAt).toLocaleDateString()}
-              </p>
+              
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 mb-1">
+                  <h4 className="font-semibold text-foreground text-lg truncate">{displayName}</h4>
+                  {attendee.isVip && (
+                    <Badge variant="secondary" className="bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 border-amber-200 text-xs font-medium">
+                      VIP
+                    </Badge>
+                  )}
+                </div>
+                
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground truncate">{displayEmail}</p>
+                  {displayCompany && (
+                    <p className="text-sm text-muted-foreground/80 truncate">
+                      {displayJob ? `${displayJob} at ${displayCompany}` : displayCompany}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground/60 flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    Registered {new Date(attendee.registeredAt).toLocaleDateString('en-US', { 
+                      month: 'short', 
+                      day: 'numeric',
+                      year: 'numeric'
+                    })}
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            {getStatusBadge(attendee.status)}
             
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" disabled={isPending}>
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {attendee.status === 'pending' && (
-                  <>
-                    <DropdownMenuItem onClick={() => handleApprove(attendee.id)}>
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Approve
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setSelectedAttendee(attendee.id)}>
-                      <XCircle className="h-4 w-4 mr-2" />
-                      Decline
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleMoveToWaitlist(attendee.id)}>
-                      <Clock className="h-4 w-4 mr-2" />
-                      Move to Waitlist
-                    </DropdownMenuItem>
-                  </>
-                )}
-                
-                {attendee.status === 'approved' && (
-                  <>
-                    <DropdownMenuItem onClick={() => handleCheckIn(attendee.id)}>
-                      <UserCheck className="h-4 w-4 mr-2" />
-                      Check In
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleMoveToWaitlist(attendee.id)}>
-                      <Clock className="h-4 w-4 mr-2" />
-                      Move to Waitlist
-                    </DropdownMenuItem>
-                  </>
-                )}
-                
-                {attendee.status === 'waitlisted' && (
-                  <DropdownMenuItem onClick={() => handleApprove(attendee.id)}>
-                    <CheckCircle className="h-4 w-4 mr-2" />
+            <div className="flex items-center gap-2 ml-4">
+              {attendee.status === 'pending' ? (
+                <div className="flex items-center gap-2">
+                  <Button 
+                    size="sm" 
+                    onClick={() => handleApprove(attendee.id)}
+                    disabled={isPending}
+                    className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-sm border-0 transition-all duration-200 hover:shadow-md hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                  >
+                    <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
                     Approve
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => setSelectedAttendee(attendee.id)}
+                    disabled={isPending}
+                    className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                  >
+                    <XCircle className="h-3.5 w-3.5 mr-1.5" />
+                    Decline
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => handleMoveToWaitlist(attendee.id)}
+                    disabled={isPending}
+                    className="border-amber-200 text-amber-600 hover:bg-amber-50 hover:border-amber-300 hover:text-amber-700 transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                  >
+                    <Clock className="h-3.5 w-3.5 mr-1.5" />
+                    Waitlist
+                  </Button>
+                </div>
+              ) : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      disabled={isPending} 
+                      className="hover:bg-muted/50 transition-colors duration-200 rounded-full w-8 h-8 p-0"
+                    >
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    {attendee.status === 'approved' && (
+                      <>
+                        <DropdownMenuItem onClick={() => handleCheckIn(attendee.id)} className="cursor-pointer">
+                          <UserCheck className="h-4 w-4 mr-2" />
+                          Check In
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleMoveToWaitlist(attendee.id)} className="cursor-pointer">
+                          <Clock className="h-4 w-4 mr-2" />
+                          Move to Waitlist
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    
+                    {attendee.status === 'waitlisted' && (
+                      <DropdownMenuItem onClick={() => handleApprove(attendee.id)} className="cursor-pointer">
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Approve
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
           </div>
         </div>
       </Card>
@@ -275,19 +318,19 @@ export function AttendeeManagement({ eventId, requiresApproval }: AttendeeManage
   return (
     <div className="space-y-6">
       {/* Search and Filter */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 mb-6">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
             placeholder="Search attendees by name, email, or company..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 h-10 bg-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50 transition-all duration-200"
           />
         </div>
         
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-48">
+          <SelectTrigger className="w-48 h-10 bg-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50 transition-all duration-200">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
@@ -303,35 +346,43 @@ export function AttendeeManagement({ eventId, requiresApproval }: AttendeeManage
 
       {/* Attendee Tabs */}
       <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="pending" className="flex items-center gap-2">
+        <TabsList className="grid w-full grid-cols-5 bg-muted/30 backdrop-blur-sm p-1 h-12 rounded-lg">
+          <TabsTrigger value="pending" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200 font-medium">
             <Clock className="h-4 w-4" />
             Pending ({attendeesByStatus.pending.length})
           </TabsTrigger>
-          <TabsTrigger value="approved" className="flex items-center gap-2">
+          <TabsTrigger value="approved" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200 font-medium">
             <CheckCircle className="h-4 w-4" />
             Approved ({attendeesByStatus.approved.length})
           </TabsTrigger>
-          <TabsTrigger value="waitlisted" className="flex items-center gap-2">
+          <TabsTrigger value="waitlisted" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200 font-medium">
             <AlertCircle className="h-4 w-4" />
             Waitlisted ({attendeesByStatus.waitlisted.length})
           </TabsTrigger>
-          <TabsTrigger value="checked_in" className="flex items-center gap-2">
+          <TabsTrigger value="checked_in" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200 font-medium">
             <UserCheck className="h-4 w-4" />
             Checked In ({attendeesByStatus.checked_in.length})
           </TabsTrigger>
-          <TabsTrigger value="declined" className="flex items-center gap-2">
+          <TabsTrigger value="declined" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200 font-medium">
             <XCircle className="h-4 w-4" />
             Declined ({attendeesByStatus.declined.length})
           </TabsTrigger>
         </TabsList>
 
         {Object.entries(attendeesByStatus).map(([status, statusAttendees]) => (
-          <TabsContent key={status} value={status} className="mt-6">
-            <div className="space-y-4">
+          <TabsContent key={status} value={status} className="mt-8">
+            <div className="space-y-3">
               {statusAttendees.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  No {status.replace('_', ' ')} attendees found
+                <div className="text-center py-12 text-muted-foreground">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-muted/30 rounded-full flex items-center justify-center">
+                    <Users className="w-8 h-8 text-muted-foreground/50" />
+                  </div>
+                  <p className="text-lg font-medium">No {status.replace('_', ' ')} attendees</p>
+                  <p className="text-sm text-muted-foreground/70 mt-1">
+                    {status === 'pending' ? 'New registrations will appear here' : 
+                     status === 'approved' ? 'Approved attendees will appear here' :
+                     `${status.replace('_', ' ')} attendees will appear here`}
+                  </p>
                 </div>
               ) : (
                 statusAttendees.map((attendee) => (

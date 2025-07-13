@@ -484,13 +484,15 @@ export async function registerForEvent(eventId: string, guestData?: {
   
   const result = await db.insert(eventAttendees).values(attendeeData).returning();
   
-  // Update the total registrations count in the events table
-  await db.update(events)
-    .set({ 
-      totalRegistrations: sql`${events.totalRegistrations} + 1`,
-      updatedAt: new Date()
-    })
-    .where(eq(events.id, eventId));
+  // Update the total registrations count in the events table (only for approved registrations)
+  if (initialStatus === 'approved') {
+    await db.update(events)
+      .set({ 
+        totalRegistrations: sql`${events.totalRegistrations} + 1`,
+        updatedAt: new Date()
+      })
+      .where(eq(events.id, eventId));
+  }
   
   return result[0];
 }
@@ -589,7 +591,7 @@ export async function approveAttendee(eventId: string, attendeeId: string) {
     ))
     .returning();
   
-  // Update total registrations count (only if coming from pending status)
+  // Update total registrations count when approving from pending status
   if (attendee[0].status === 'pending') {
     await db.update(events)
       .set({ 
@@ -679,6 +681,28 @@ export async function getUserEventStatus(eventId: string, userId: string) {
     ))
     .limit(1);
   return result[0] || null;
+}
+
+export async function getUserRegisteredEvents(userId: string) {
+  return await db.select({
+    event: events,
+    attendee: {
+      id: eventAttendees.id,
+      status: eventAttendees.status,
+      registeredAt: eventAttendees.registeredAt,
+      approvedAt: eventAttendees.approvedAt,
+      checkedIn: eventAttendees.checkedIn,
+      checkedInAt: eventAttendees.checkedInAt,
+      isVip: eventAttendees.isVip
+    }
+  })
+  .from(eventAttendees)
+  .innerJoin(events, eq(eventAttendees.eventId, events.id))
+  .where(and(
+    eq(eventAttendees.userId, userId),
+    eq(events.status, 'published') // Only show published events
+  ))
+  .orderBy(desc(events.startDate));
 }
 
 export async function getEventAttendeesCount(eventId: string) {
@@ -826,10 +850,14 @@ export async function getUserProfileData(username: string, viewerId?: string) {
   
   const userEvents = await (isOwner ? baseQuery : baseQuery.limit(10))
 
+  // Get registered events only for the profile owner
+  const registeredEvents = isOwner ? await getUserRegisteredEvents(user.id) : []
+
   return {
     user,
     stats,
-    events: userEvents
+    events: userEvents,
+    registeredEvents
   }
 }
 

@@ -64,7 +64,7 @@ export function DateTimePicker({
   const [timezoneOpen, setTimezoneOpen] = React.useState(false)
 
   return (
-    <div className="space-y-8 p-4 rounded-lg bg-background/10">
+    <div className="space-y-8 p-4 rounded-lg bg-muted/30">
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <div className="w-2.5 h-2.5 bg-green-500 rounded-full"></div>
@@ -77,8 +77,8 @@ export function DateTimePicker({
               <Button
                 variant="outline"
                 className={cn(
-                  "col-span-3 h-14 justify-start text-left font-normal bg-black/20 hover:bg-black/30 text-white hover:text-white border-0",
-                  !startDate && "text-gray-400 hover:text-gray-200"
+                  "col-span-3 h-14 justify-start text-left font-normal hover:bg-accent hover:text-accent-foreground",
+                  !startDate && "text-muted-foreground"
                 )}
                 onClick={(e) => {
                   e.preventDefault();
@@ -108,7 +108,7 @@ export function DateTimePicker({
           <TimePicker
             value={startTime}
             onChange={onStartTimeChange}
-            className="col-span-2 h-14 bg-black/20 hover:bg-black/30 text-white hover:text-white border-0"
+            className="col-span-2 h-14 hover:bg-accent hover:text-accent-foreground"
             placeholder="Pick a time"
           />
         </div>
@@ -126,8 +126,8 @@ export function DateTimePicker({
               <Button
                 variant="outline"
                 className={cn(
-                  "col-span-3 h-14 justify-start text-left font-normal bg-black/20 hover:bg-black/30 text-white hover:text-white border-0",
-                  !endDate && "text-gray-400 hover:text-gray-200"
+                  "col-span-3 h-14 justify-start text-left font-normal hover:bg-accent hover:text-accent-foreground",
+                  !endDate && "text-muted-foreground"
                 )}
                 onClick={(e) => {
                   e.preventDefault();
@@ -157,7 +157,7 @@ export function DateTimePicker({
           <TimePicker
             value={endTime}
             onChange={onEndTimeChange}
-            className="col-span-2 h-14 bg-black/20 hover:bg-black/30 text-white hover:text-white border-0"
+            className="col-span-2 h-14 hover:bg-accent hover:text-accent-foreground"
             placeholder="Pick a time"
           />
         </div>
@@ -167,7 +167,7 @@ export function DateTimePicker({
       <div className="mt-4">
         <Button 
           variant="outline" 
-          className="w-full h-14 justify-between text-left font-normal bg-black/20 hover:bg-black/30 text-white hover:text-white border-0"
+          className="w-full h-14 justify-between text-left font-normal hover:bg-accent hover:text-accent-foreground"
           onClick={() => setTimezoneOpen(!timezoneOpen)}
         >
           <div className="flex items-center gap-2">
@@ -181,13 +181,13 @@ export function DateTimePicker({
         </Button>
         
         {timezoneOpen && (
-          <div className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-black/90 py-1 shadow-lg">
+          <div className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-popover border shadow-lg">
             {timezones.map((tz) => (
               <div
                 key={tz.value}
                 className={cn(
-                  "px-3 py-2 text-sm cursor-pointer text-white hover:bg-black/50",
-                  timezone === tz.value && "bg-black/60 font-medium"
+                  "px-3 py-2 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
+                  timezone === tz.value && "bg-accent text-accent-foreground font-medium"
                 )}
                 onClick={() => {
                   onTimezoneChange?.(tz.value)

@@ -73,26 +73,25 @@ export default async function EventManagePage({
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <Button asChild variant="outline" size="sm">
-              <Link href={`/event/${slug}`} className="flex items-center gap-2">
+              <Link href={`/events/${slug}`} className="flex items-center gap-2">
                 <ArrowLeft className="w-4 h-4" />
                 Back to Event
               </Link>
             </Button>
             <div>
               <h1 className="text-3xl font-bold text-foreground">{event.title}</h1>
-              <p className="text-muted-foreground mt-1">Event Management Dashboard</p>
             </div>
           </div>
           
           <div className="flex items-center gap-3">
             <Button asChild variant="outline" size="sm">
-              <Link href={`/event/${slug}?edit=true`} className="flex items-center gap-2">
+              <Link href={`/events/${slug}?edit=true`} className="flex items-center gap-2">
                 <Settings className="w-4 h-4" />
                 Edit Event
               </Link>
             </Button>
             <Button asChild variant="outline" size="sm">
-              <Link href={`/event/${slug}`} className="flex items-center gap-2">
+              <Link href={`/events/${slug}`} className="flex items-center gap-2">
                 <Eye className="w-4 h-4" />
                 View Public Page
               </Link>
@@ -110,14 +109,30 @@ export default async function EventManagePage({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm font-medium">{formatDate(startDate)}</p>
-              <div className="flex items-center gap-2 mt-2">
-                <Badge variant={event.status === 'published' ? 'default' : 'secondary'}>
-                  {event.status ? event.status.charAt(0).toUpperCase() + event.status.slice(1) : 'Draft'}
-                </Badge>
-                <Badge variant="outline" className="capitalize">
-                  {event.visibility}
-                </Badge>
+              <div className="space-y-2">
+                <p className="text-sm font-medium">
+                  {new Date(event.startDate).toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {new Date(event.startDate).toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                  })}
+                </p>
+                <div className="flex items-center gap-2 mt-3">
+                  <Badge variant={event.status === 'published' ? 'default' : 'secondary'}>
+                    {event.status ? event.status.charAt(0).toUpperCase() + event.status.slice(1) : 'Draft'}
+                  </Badge>
+                  <Badge variant="outline" className="capitalize">
+                    {event.visibility}
+                  </Badge>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -170,68 +185,7 @@ export default async function EventManagePage({
           </Card>
         </div>
 
-        {/* Registration Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Users className="w-4 h-4" />
-                Total Registrations
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{dashboardData.stats.totalRegistrations}</p>
-            </CardContent>
-          </Card>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                Pending Approval
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-yellow-600">{dashboardData.stats.pending}</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <CheckCircle className="w-4 h-4" />
-                Approved
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-green-600">{dashboardData.stats.approved}</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <AlertCircle className="w-4 h-4" />
-                Waitlisted
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-orange-600">{dashboardData.stats.waitlisted}</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <UserCheck className="w-4 h-4" />
-                Checked In
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-blue-600">{dashboardData.stats.checkedIn}</p>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Attendee Management */}
         <Card>

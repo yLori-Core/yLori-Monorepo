@@ -25,7 +25,7 @@ export async function approveAttendeeAction(eventId: string, attendeeId: string)
     
     await approveAttendee(eventId, attendeeId)
     
-    revalidatePath(`/event/[slug]/manage`, 'page')
+    revalidatePath(`/events/[slug]/manage`, 'page')
     
     return { success: true }
   } catch (error) {
@@ -60,7 +60,7 @@ export async function declineAttendeeAction(eventId: string, attendeeId: string,
         eq(eventAttendees.eventId, eventId)
       ))
     
-    revalidatePath(`/event/[slug]/manage`, 'page')
+    revalidatePath(`/events/[slug]/manage`, 'page')
     
     return { success: true }
   } catch (error) {
@@ -85,7 +85,7 @@ export async function moveToWaitlistAction(eventId: string, attendeeId: string) 
     
     await moveToWaitlist(eventId, attendeeId)
     
-    revalidatePath(`/event/[slug]/manage`, 'page')
+    revalidatePath(`/events/[slug]/manage`, 'page')
     
     return { success: true }
   } catch (error) {
@@ -110,7 +110,7 @@ export async function checkInAttendeeAction(eventId: string, attendeeId: string)
     
     await checkInAttendee(eventId, attendeeId)
     
-    revalidatePath(`/event/[slug]/manage`, 'page')
+    revalidatePath(`/events/[slug]/manage`, 'page')
     
     return { success: true }
   } catch (error) {

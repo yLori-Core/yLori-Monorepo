@@ -70,8 +70,8 @@ export function TimePicker({
     >
       <SelectTrigger 
         className={cn(
-          "h-full text-left font-normal text-white",
-          !value && "text-gray-400 hover:text-gray-200",
+          "h-full text-left font-normal",
+          !value && "text-muted-foreground",
           className
         )}
       >
@@ -81,7 +81,7 @@ export function TimePicker({
         </div>
       </SelectTrigger>
       <SelectContent 
-        className="max-h-[300px] w-[160px] bg-black/90"
+        className="max-h-[300px] w-[160px]"
         position="popper"
         sideOffset={4}
       >
@@ -89,7 +89,7 @@ export function TimePicker({
           <SelectItem 
             key={time.value} 
             value={time.value} 
-            className="text-sm cursor-pointer text-white hover:bg-black/50"
+            className="text-sm cursor-pointer"
           >
             {time.label}
           </SelectItem>

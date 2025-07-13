@@ -1,0 +1,1 @@
+ALTER TABLE "events" ALTER COLUMN "requires_approval" SET DEFAULT true;

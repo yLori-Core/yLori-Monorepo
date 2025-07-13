@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { EventForm } from "@/components/event-form"
-import { publishEventAction, registerForEventAction } from "@/app/event/actions"
+import { publishEventAction, registerForEventAction } from "@/app/events/actions"
 import { 
   Edit, 
   Calendar, 
@@ -63,7 +63,7 @@ export default async function EventPage({
   
   // If in edit mode but not organizer, redirect to view mode
   if (isEditMode && !isOrganizer) {
-    redirect(`/event/${slug}`)
+    redirect(`/events/${slug}`)
   }
   
   // Format dates
@@ -91,7 +91,7 @@ export default async function EventPage({
     'use server'
     const result = await publishEventAction(event.id)
     if (result.success) {
-      redirect(`/event/${slug}`)
+      redirect(`/events/${slug}`)
     }
   }
 
@@ -99,7 +99,7 @@ export default async function EventPage({
     'use server'
     const result = await registerForEventAction(event.id)
     if (result.success) {
-      revalidatePath(`/event/${slug}`)
+      revalidatePath(`/events/${slug}`)
     } else {
       // Handle error - in a real app, you'd want to show this to the user
       console.error('Registration failed:', result.error)
@@ -181,7 +181,7 @@ export default async function EventPage({
                 <p className="text-muted-foreground mt-1">Make changes to your event details</p>
               </div>
               <Button asChild variant="outline">
-                <Link href={`/event/${slug}`}>Cancel</Link>
+                <Link href={`/events/${slug}`}>Cancel</Link>
               </Button>
             </div>
             <EventForm initialData={event} />
@@ -229,14 +229,14 @@ export default async function EventPage({
                   {isOrganizer && (
                     <>
                       <Button asChild variant="outline" size="sm">
-                        <Link href={`/event/${slug}/manage`} className="flex items-center gap-2">
+                        <Link href={`/events/${slug}/manage`} className="flex items-center gap-2">
                           <Settings className="w-4 h-4" />
                           Manage Event
                         </Link>
                       </Button>
                       
                       <Button asChild variant="outline" size="sm">
-                        <Link href={`/event/${slug}?edit=true`} className="flex items-center gap-2">
+                        <Link href={`/events/${slug}?edit=true`} className="flex items-center gap-2">
                           <Edit className="w-4 h-4" />
                           Edit
                         </Link>
@@ -350,12 +350,12 @@ export default async function EventPage({
                   <CardContent className="space-y-4">
                     <div>
                       <div className="font-medium text-foreground">
-                        {event.ticketType === 'free' ? 'Free' : 
-                         event.ticketType === 'paid' ? `${event.currency || '$'}${event.ticketPrice || '0'}` : 
-                         event.ticketType ? event.ticketType.toUpperCase() : 'RSVP'}
+                        {event.ticketType === 'qr_code' ? 'QR Code Ticket' : 
+                         event.ticketType === 'nft' ? 'NFT Ticket' : 
+                         'Digital Ticket'}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        {event.requiresApproval ? 'Approval required' : 'Open registration'}
+                        Organizer approval required
                       </div>
                     </div>
                     
@@ -424,8 +424,8 @@ export default async function EventPage({
                         <div className="text-xs text-muted-foreground">Shares</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-foreground">{realTimeRegistrationCount}</div>
-                        <div className="text-xs text-muted-foreground">Registered</div>
+                        <div className="text-2xl font-bold text-foreground">{event.totalRegistrations || 0}</div>
+                        <div className="text-xs text-muted-foreground">Approved</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold text-foreground">{event.totalCheckins || 0}</div>

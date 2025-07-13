@@ -34,9 +34,9 @@ export function CreateEventForm() {
   const [location, setLocation] = useState("")
   const [virtualUrl, setVirtualUrl] = useState("")
   const [capacity, setCapacity] = useState<number | undefined>(undefined)
-  const [requiresApproval, setRequiresApproval] = useState(false)
+  const [requiresApproval, setRequiresApproval] = useState(true)
   const [visibility, setVisibility] = useState<'public' | 'private' | 'unlisted'>('public')
-  const [ticketType, setTicketType] = useState<'free' | 'paid' | 'donation' | 'rsvp'>('free')
+  const [ticketType, setTicketType] = useState<'qr_code' | 'nft'>('qr_code')
   const [ticketPrice, setTicketPrice] = useState<number | undefined>(undefined)
 
   // Image states
@@ -82,10 +82,7 @@ export function CreateEventForm() {
       }
     }
     
-    // Validate ticket price if paid
-    if (ticketType === 'paid' && (ticketPrice === undefined || ticketPrice <= 0)) {
-      newErrors.ticketPrice = "Please enter a valid price greater than 0";
-    }
+
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -124,7 +121,7 @@ export function CreateEventForm() {
           // Use client-side navigation to the new event page
           const slug = result.slug;
           if (slug) {
-            window.location.href = `/event/${slug}`;
+            window.location.href = `/events/${slug}`;
           }
         } else {
           setFormError(result.error || 'Failed to create event');
@@ -357,76 +354,24 @@ export function CreateEventForm() {
             />
           </div>
 
-          {/* Settings Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Visibility</label>
-              <Select value={visibility} onValueChange={(value: 'public' | 'private' | 'unlisted') => setVisibility(value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="public">Public</SelectItem>
-                  <SelectItem value="private">Private</SelectItem>
-                  <SelectItem value="unlisted">Unlisted</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <Ticket className="h-4 w-4 opacity-70" />
-                Ticket Type
-              </label>
-              <Select value={ticketType} onValueChange={(value: 'free' | 'paid' | 'donation' | 'rsvp') => setTicketType(value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="free">Free</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
-                  <SelectItem value="donation">Donation</SelectItem>
-                  <SelectItem value="rsvp">RSVP</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          {/* Ticket Type */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium flex items-center gap-2">
+              <Ticket className="h-4 w-4 opacity-70" />
+              Ticket Type
+            </label>
+            <Select value={ticketType} onValueChange={(value: 'qr_code' | 'nft') => setTicketType(value)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="qr_code">QR Code Ticket</SelectItem>
+                <SelectItem value="nft">NFT Ticket</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          {/* Ticket Price */}
-          {ticketType === 'paid' && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Ticket Price *</label>
-              <div className="flex gap-2 max-w-xs">
-                <Select defaultValue="USD">
-                  <SelectTrigger className="w-20">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="USD">USD</SelectItem>
-                    <SelectItem value="EUR">EUR</SelectItem>
-                    <SelectItem value="INR">INR</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Input
-                  type="number"
-                  name="ticketPrice"
-                  value={ticketPrice || ''}
-                  onChange={(e) => {
-                    setTicketPrice(e.target.value ? parseFloat(e.target.value) : undefined);
-                    if (e.target.value && parseFloat(e.target.value) > 0) {
-                      setErrors(prev => ({...prev, ticketPrice: undefined}));
-                    }
-                  }}
-                  placeholder="0.00"
-                  step="0.01"
-                  min="0"
-                />
-              </div>
-              {errors.ticketPrice && (
-                <div className="text-red-500 text-sm">{errors.ticketPrice}</div>
-              )}
-            </div>
-          )}
+
 
           {/* Hidden Fields */}
           <input type="hidden" name="timezone" value={timezone} />

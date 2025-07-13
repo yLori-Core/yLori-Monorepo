@@ -5,7 +5,7 @@ import { relations } from 'drizzle-orm';
 export const userRoleEnum = pgEnum('user_role', ['user', 'admin', 'moderator']);
 export const eventStatusEnum = pgEnum('event_status', ['draft', 'published', 'cancelled', 'completed', 'postponed']);
 export const eventVisibilityEnum = pgEnum('event_visibility', ['public', 'private', 'unlisted']);
-export const ticketTypeEnum = pgEnum('ticket_type', ['free', 'paid', 'donation', 'rsvp']);
+export const ticketTypeEnum = pgEnum('ticket_type', ['qr_code', 'nft']);
 export const attendeeStatusEnum = pgEnum('attendee_status', ['pending', 'approved', 'waitlisted', 'declined', 'cancelled', 'checked_in', 'no_show']);
 export const eventTypeEnum = pgEnum('event_type', ['in_person', 'virtual', 'hybrid']);
 export const organizerRoleEnum = pgEnum('organizer_role', ['host', 'co_host', 'moderator', 'speaker']);
@@ -97,10 +97,10 @@ export const events = pgTable('events', {
   capacity: integer('capacity'), // null = unlimited
   waitlistEnabled: boolean('waitlist_enabled').default(false),
   waitlistCapacity: integer('waitlist_capacity'),
-  requiresApproval: boolean('requires_approval').default(false),
+  requiresApproval: boolean('requires_approval').default(true),
   
   // Ticketing
-  ticketType: ticketTypeEnum('ticket_type').default('free'),
+  ticketType: ticketTypeEnum('ticket_type').default('qr_code'),
   ticketPrice: decimal('ticket_price', { precision: 10, scale: 2 }), // in currency units
   currency: text('currency').default('USD'),
   ticketSaleStart: timestamp('ticket_sale_start'),
