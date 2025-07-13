@@ -139,7 +139,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ us
                   className="w-9 h-9 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
                   asChild
                 >
-                  <a href={`https://twitter.com/${user.twitterHandle}`} target="_blank" rel="noopener noreferrer">
+                  <a href={`https://x.com/${user.twitterHandle}`} target="_blank" rel="noopener noreferrer">
                     <Twitter className="w-4 h-4" />
                   </a>
                 </Button>

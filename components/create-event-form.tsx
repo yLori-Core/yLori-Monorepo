@@ -206,14 +206,49 @@ export function CreateEventForm() {
           </div>
 
           {/* Quick Tips */}
-          <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-            <h3 className="text-sm font-medium text-foreground">Tips for great event images:</h3>
-            <ul className="text-xs text-muted-foreground space-y-1">
-              <li>• Use high-quality images (at least 1200x800px)</li>
-              <li>• Include event details or branding</li>
-              <li>• Avoid cluttered backgrounds</li>
-              <li>• Consider your brand colors</li>
-            </ul>
+          <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+            <h3 className="text-sm font-medium text-foreground">Image Requirements:</h3>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-foreground">Cover Image (Required)</h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• Recommended size: 1200×800px (3:2 ratio)</li>
+                  <li>• Minimum size: 600×400px</li>
+                  <li>• Maximum file size: 5MB</li>
+                  <li>• Best for: Event cards and previews</li>
+                </ul>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-foreground">Banner Image (Optional)</h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• Recommended size: 1920×480px (4:1 ratio)</li>
+                  <li>• Minimum size: 1200×300px</li>
+                  <li>• Maximum file size: 5MB</li>
+                  <li>• Best for: Event page headers</li>
+                </ul>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-foreground">Logo Image (Optional)</h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• Recommended size: 400×400px (1:1 ratio)</li>
+                  <li>• Minimum size: 200×200px</li>
+                  <li>• Maximum file size: 2MB</li>
+                  <li>• Best for: Organization branding</li>
+                </ul>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-foreground">Best Practices:</h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• Use high-quality, clear images</li>
+                  <li>• Ensure good contrast with text</li>
+                  <li>• Avoid text in images when possible</li>
+                  <li>• Test in both light and dark modes</li>
+                </ul>
+              </div>
+            </div>
           </div>
           </div>
         </div>

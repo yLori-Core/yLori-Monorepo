@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/session-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -20,6 +21,19 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "yLori - Delightful Web3 Events",
   description: "Discover amazing Web3 events, connect with builders, and join the community",
+  twitter: {
+    card: 'summary_large_image',
+    title: 'yLori - Delightful Web3 Events',
+    description: 'Discover amazing Web3 events, connect with builders, and join the community',
+    site: '@ylori_',
+    creator: '@ylori_'
+  },
+  openGraph: {
+    type: 'website',
+    title: 'yLori - Delightful Web3 Events',
+    description: 'Discover amazing Web3 events, connect with builders, and join the community',
+    siteName: 'yLori'
+  }
 };
 
 export default function RootLayout({
@@ -29,28 +43,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${jakarta.variable}`} suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                const savedTheme = localStorage.getItem('theme');
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                
-                if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-                  document.documentElement.classList.add('dark');
-                } else {
-                  document.documentElement.classList.remove('dark');
-                }
-              } catch (e) {}
-            `,
-          }}
-        />
-      </head>
       <body className="font-sans antialiased">
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

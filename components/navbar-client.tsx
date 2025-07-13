@@ -96,10 +96,10 @@ export function NavbarClient({ session }: NavbarClientProps) {
                 <Calendar className="w-4 h-4" />
                 <span>Calendars</span>
               </Link>
-              <Link href="/events" className="flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground hover:text-[#f47e5c] hover:bg-[#f47e5c]/10 transition-all">
+              <button className="flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground hover:text-[#f47e5c] hover:bg-[#f47e5c]/10 transition-all">
                 <Globe className="w-4 h-4" />
                 <span>Discover</span>
-              </Link>
+              </button>
             </div>
           </div>
           
@@ -229,14 +229,13 @@ export function NavbarClient({ session }: NavbarClientProps) {
                         Calendars
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link 
-                        href="/events" 
+                    <DropdownMenuItem>
+                      <button 
                         className="flex items-center w-full hover:bg-[#f47e5c]/10 focus:bg-[#f47e5c]/10 text-foreground hover:text-[#f47e5c]"
                       >
                         <Globe className="mr-2 h-4 w-4" />
                         Discover
-                      </Link>
+                      </button>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>

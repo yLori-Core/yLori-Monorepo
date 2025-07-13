@@ -435,7 +435,7 @@ export default function LandingPage() {
                 The easiest way to plan and manage Web3 events with token-gated access and on-chain RSVPs.
               </p>
               <div className="flex space-x-4 pt-2">
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-[#9b6fb5] transition-colors">
+                <a href="https://x.com/ylori_" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-[#9b6fb5] transition-colors">
                   <Twitter className="h-4 sm:h-5 w-4 sm:w-5" />
                 </a>
                 <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-[#e36c89] transition-colors">
