@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { EventForm } from "@/components/event-form"
-import { publishEventAction, registerForEventAction } from "@/app/events/actions"
+import { EventRegistration } from "@/components/event-registration"
+import { handlePublishAction } from "./actions"
+import { type Event } from "@/lib/db/schema"
 import { 
   Edit, 
   Calendar, 
@@ -22,21 +24,17 @@ import {
   DollarSign,
   UserCheck,
   Settings,
-  Send,
-  CheckCircle,
-  AlertCircle
+  Send
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { revalidatePath } from "next/cache"
 
-export default async function EventPage({ 
-  params, 
-  searchParams 
-}: { 
+interface PageProps {
   params: Promise<{ slug: string }>
   searchParams: Promise<{ edit?: string }>
-}) {
+}
+
+export default async function EventPage({ params, searchParams }: PageProps) {
   const { slug } = await params
   const { edit } = await searchParams
   const session = await getServerSession(authOptions)
@@ -87,84 +85,6 @@ export default async function EventPage({
     }).format(date)
   }
 
-  const handlePublish = async () => {
-    'use server'
-    const result = await publishEventAction(event.id)
-    if (result.success) {
-      redirect(`/events/${slug}`)
-    }
-  }
-
-  const handleRegister = async () => {
-    'use server'
-    const result = await registerForEventAction(event.id)
-    if (result.success) {
-      revalidatePath(`/events/${slug}`)
-    } else {
-      // Handle error - in a real app, you'd want to show this to the user
-      console.error('Registration failed:', result.error)
-    }
-  }
-
-  const getRegistrationButton = () => {
-    if (!session?.user) {
-      return (
-        <Button className="w-full" asChild>
-          <Link href="/auth/signin">Sign In to Register</Link>
-        </Button>
-      )
-    }
-
-    if (isOrganizer) {
-      return (
-        <Button className="w-full" disabled>
-          <UserCheck className="w-4 h-4 mr-2" />
-          You're an Organizer
-        </Button>
-      )
-    }
-
-    if (userRegistration) {
-      const statusIcons = {
-        'pending': <AlertCircle className="w-4 h-4 mr-2" />,
-        'approved': <CheckCircle className="w-4 h-4 mr-2" />,
-        'waitlisted': <Clock className="w-4 h-4 mr-2" />,
-        'checked_in': <CheckCircle className="w-4 h-4 mr-2" />,
-        'cancelled': <AlertCircle className="w-4 h-4 mr-2" />,
-        'declined': <AlertCircle className="w-4 h-4 mr-2" />,
-        'no_show': <AlertCircle className="w-4 h-4 mr-2" />
-      }
-      
-      const statusColors = {
-        'pending': 'bg-yellow-600 hover:bg-yellow-700',
-        'approved': 'bg-green-600 hover:bg-green-700',
-        'waitlisted': 'bg-orange-600 hover:bg-orange-700',
-        'checked_in': 'bg-blue-600 hover:bg-blue-700',
-        'cancelled': 'bg-red-600 hover:bg-red-700',
-        'declined': 'bg-gray-600 hover:bg-gray-700',
-        'no_show': 'bg-purple-600 hover:bg-purple-700'
-      }
-
-      return (
-        <Button 
-          className={`w-full ${statusColors[userRegistration.status] || 'bg-green-600 hover:bg-green-700'}`} 
-          disabled
-        >
-          {statusIcons[userRegistration.status]}
-          {userRegistration.status.charAt(0).toUpperCase() + userRegistration.status.slice(1).replace('_', ' ')}
-        </Button>
-      )
-    }
-
-    return (
-      <form action={handleRegister}>
-        <Button type="submit" className="w-full">
-          Register for Event
-        </Button>
-      </form>
-    )
-  }
-  
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -190,18 +110,6 @@ export default async function EventPage({
           <>
             {/* Event Header */}
             <div className="mb-8">
-              {/* Status Badge */}
-              <div className="mb-6">
-                <Badge 
-                  variant={event.status === 'published' ? 'default' : 'secondary'} 
-                  className="mb-4"
-                >
-                  {event.status ? event.status.charAt(0).toUpperCase() + event.status.slice(1) : 'Draft'}
-                </Badge>
-                
-
-              </div>
-
               {/* Cover Image */}
               {event.coverImage && (
                 <div className="w-full h-64 bg-muted rounded-lg mb-8 overflow-hidden">
@@ -225,39 +133,38 @@ export default async function EventPage({
                 </div>
                 
                 {/* Action Buttons */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
+                  {/* Approved Participants Count */}
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-card/50 backdrop-blur-sm border">
+                    <UserCheck className="w-4 h-4 text-primary" />
+                    <span className="font-medium">{realTimeRegistrationCount}</span>
+                    <span className="text-sm text-muted-foreground">going</span>
+                  </div>
+                  
                   {isOrganizer && (
                     <>
-                      <Button asChild variant="outline" size="sm">
-                        <Link href={`/events/${slug}/manage`} className="flex items-center gap-2">
-                          <Settings className="w-4 h-4" />
-                          Manage Event
-                        </Link>
-                      </Button>
-                      
-                      <Button asChild variant="outline" size="sm">
-                        <Link href={`/events/${slug}?edit=true`} className="flex items-center gap-2">
-                          <Edit className="w-4 h-4" />
-                          Edit
-                        </Link>
-                      </Button>
-                      
-                      {event.status === 'draft' && (
-                        <form action={handlePublish} className="inline">
-                          <Button type="submit" size="sm" className="bg-green-600 hover:bg-green-700">
+                      {event.status === 'draft' ? (
+                        <form action={handlePublishAction.bind(null, event.id, slug)}>
+                          <Button type="submit" variant="outline">
                             <Send className="w-4 h-4 mr-2" />
                             Publish
                           </Button>
                         </form>
+                      ) : (
+                        <Button asChild variant="outline">
+                          <Link href={`/events/${slug}/manage`}>
+                            <Settings className="w-4 h-4 mr-2" />
+                            Manage
+                          </Link>
+                        </Button>
                       )}
+                      <Button asChild variant="outline">
+                        <Link href={`/events/${slug}?edit=true`}>
+                          <Edit className="w-4 h-4 mr-2" />
+                          Edit
+                        </Link>
+                      </Button>
                     </>
-                  )}
-                  
-                  {event.status === 'published' && (
-                    <Button variant="outline" size="sm">
-                      <Share className="w-4 h-4 mr-2" />
-                      Share
-                    </Button>
                   )}
                 </div>
               </div>
@@ -303,7 +210,7 @@ export default async function EventPage({
                         {event.eventType === 'virtual' ? 'Virtual Event' : event.location || 'Location TBA'}
                       </div>
                       <div className="text-sm text-muted-foreground capitalize">
-                        {event.eventType?.replace('_', ' ')}
+                        {event.eventType.replace('_', ' ')}
                       </div>
                       {event.virtualUrl && userRegistration?.status === 'approved' && (
                         <Button asChild variant="outline" size="sm" className="mt-3">
@@ -359,79 +266,15 @@ export default async function EventPage({
                       </div>
                     </div>
                     
-                    {event.status === 'draft' ? (
-                      <Button className="w-full" disabled>
-                        Event Not Published
-                      </Button>
-                    ) : (
-                      getRegistrationButton()
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Event Info Card */}
-                <Card>
-                  <CardHeader className="pb-4">
-                    <h3 className="text-lg font-semibold flex items-center gap-2">
-                      <Settings className="w-5 h-5" />
-                      Event Details
-                    </h3>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {event.capacity && (
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-sm">
-                          <Users className="w-4 h-4" />
-                          <span>Capacity</span>
-                        </div>
-                        <span className="font-medium">{event.capacity}</span>
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Eye className="w-4 h-4" />
-                        <span>Visibility</span>
-                      </div>
-                      <Badge variant="outline" className="capitalize">
-                        {event.visibility}
-                      </Badge>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-sm">
-                        <UserCheck className="w-4 h-4" />
-                        <span>Registered</span>
-                      </div>
-                      <span className="font-medium">{realTimeRegistrationCount}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Event Stats Card */}
-                <Card>
-                  <CardHeader className="pb-4">
-                    <h3 className="text-lg font-semibold">Event Statistics</h3>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-foreground">{event.totalViews || 0}</div>
-                        <div className="text-xs text-muted-foreground">Views</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-foreground">{event.totalShares || 0}</div>
-                        <div className="text-xs text-muted-foreground">Shares</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-foreground">{event.totalRegistrations || 0}</div>
-                        <div className="text-xs text-muted-foreground">Approved</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-foreground">{event.totalCheckins || 0}</div>
-                        <div className="text-xs text-muted-foreground">Check-ins</div>
-                      </div>
-                    </div>
+                    <EventRegistration 
+                      session={session}
+                      isOrganizer={isOrganizer}
+                      userRegistration={userRegistration}
+                      eventId={event.id}
+                      slug={slug}
+                      isDraft={event.status === 'draft'}
+                      ticketType={event.ticketType}
+                    />
                   </CardContent>
                 </Card>
               </div>

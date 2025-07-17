@@ -59,7 +59,7 @@ export function NavbarClient({ session }: NavbarClientProps) {
   }, [session]);
 
   const handleSignOut = async () => {
-    await signOut();
+    await signOut({ callbackUrl: '/' });
   };
   
   // Create a fallback for avatar

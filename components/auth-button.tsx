@@ -50,7 +50,7 @@ export function AuthButton() {
             <User className="mr-2 h-4 w-4" />
             Profile
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => signOut()} className="hover:bg-[#e36c89]/10 focus:bg-[#e36c89]/10 hover:text-[#e36c89] focus:text-[#e36c89]">
+          <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/' })} className="hover:bg-[#e36c89]/10 focus:bg-[#e36c89]/10 hover:text-[#e36c89] focus:text-[#e36c89]">
             <LogOut className="mr-2 h-4 w-4" />
             Sign out
           </DropdownMenuItem>

@@ -1,4 +1,5 @@
 import { pgTable, text, timestamp, boolean, integer, uuid, varchar, json, decimal, pgEnum, uniqueIndex, index } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 import { relations } from 'drizzle-orm';
 
 // Enums
