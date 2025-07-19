@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useTransition, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -14,6 +14,7 @@ import { createEventAction } from "@/app/create/actions"
 import { updateEventAction } from "@/app/events/actions"
 import { DateTimePicker } from "@/components/date-time-picker"
 import { ImageUpload } from "@/components/image-upload"
+import { EventQuestionsManager, type EventQuestion } from "@/components/event-questions-manager"
 
 interface EventData {
   id?: string;
@@ -90,6 +91,38 @@ export function EventForm({ initialData = {} }: EventFormProps) {
   const [showLocationInput, setShowLocationInput] = useState(false)
   const [showDescriptionInput, setShowDescriptionInput] = useState(false)
   const [showCapacityInput, setShowCapacityInput] = useState(false)
+
+  // Custom questions state
+  const [customQuestions, setCustomQuestions] = useState<EventQuestion[]>([])
+  const [questionsLoaded, setQuestionsLoaded] = useState(false)
+
+  // Load existing questions when editing
+  useEffect(() => {
+    if (isEditing && eventId && !questionsLoaded) {
+      fetch(`/api/events/${eventId}/questions`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && Array.isArray(data.questions)) {
+            const formattedQuestions = data.questions.map((q: any, index: number) => ({
+              id: q.id,
+              question: q.question,
+              questionType: q.questionType,
+              options: q.options ? JSON.parse(q.options) : undefined,
+              isRequired: q.isRequired,
+              order: q.order || index,
+            }))
+            setCustomQuestions(formattedQuestions)
+          }
+          setQuestionsLoaded(true)
+        })
+        .catch(error => {
+          console.error('Failed to load questions:', error)
+          setQuestionsLoaded(true)
+        })
+    } else if (!isEditing) {
+      setQuestionsLoaded(true)
+    }
+  }, [isEditing, eventId, questionsLoaded])
 
   const validateForm = () => {
     const newErrors: {
@@ -440,9 +473,18 @@ export function EventForm({ initialData = {} }: EventFormProps) {
         </Select>
       </div>
 
-
+      {/* Custom Questions */}
+      {questionsLoaded && (
+        <div className="pt-8">
+          <EventQuestionsManager
+            questions={customQuestions}
+            onChange={setCustomQuestions}
+          />
+        </div>
+      )}
 
       {/* Hidden fields */}
+      <input type="hidden" name="customQuestions" value={JSON.stringify(customQuestions)} />
       <input type="hidden" name="timezone" value={timezone} />
       <input type="hidden" name="eventType" value={eventType} />
       <input type="hidden" name="visibility" value={visibility} />

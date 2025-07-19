@@ -9,6 +9,7 @@ import { CalendarIcon, MapPin, Users, Ticket, Globe, Plus } from "lucide-react"
 import { createEventAction } from "@/app/create/actions"
 import { DateTimePicker } from "@/components/date-time-picker"
 import { ImageUpload } from "@/components/image-upload"
+import { EventQuestionsManager, type EventQuestion } from "@/components/event-questions-manager"
 
 export function CreateEventForm() {
   const [isPending, startTransition] = useTransition()
@@ -46,6 +47,9 @@ export function CreateEventForm() {
 
   // UI state
   const [showOptionalFields, setShowOptionalFields] = useState(false)
+
+  // Custom questions state
+  const [customQuestions, setCustomQuestions] = useState<EventQuestion[]>([])
 
   const validateForm = () => {
     const newErrors: {
@@ -406,9 +410,16 @@ export function CreateEventForm() {
             </Select>
           </div>
 
-
+          {/* Custom Questions */}
+          <div className="pt-8">
+            <EventQuestionsManager
+              questions={customQuestions}
+              onChange={setCustomQuestions}
+            />
+          </div>
 
           {/* Hidden Fields */}
+          <input type="hidden" name="customQuestions" value={JSON.stringify(customQuestions)} />
           <input type="hidden" name="timezone" value={timezone} />
           <input type="hidden" name="eventType" value={eventType} />
           <input type="hidden" name="requiresApproval" value={requiresApproval.toString()} />

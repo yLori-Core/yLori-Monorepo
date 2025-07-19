@@ -22,7 +22,10 @@ import {
   Building2, 
   Briefcase,
   Loader2,
-  Calendar
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  HelpCircle
 } from "lucide-react"
 import { useAttendees } from "./providers/attendee-provider"
 import { type EventAttendee, attendeeStatusEnum } from "@/lib/db/schema"
@@ -116,7 +119,29 @@ export function AttendeeManagement({ eventId, requiresApproval }: AttendeeManage
   const [selectedAttendee, setSelectedAttendee] = useState<string | null>(null)
   const [declineReason, setDeclineReason] = useState('')
   const [isPending, setIsPending] = useState(false)
+  const [eventQuestions, setEventQuestions] = useState<Record<string, string>>({})
   const { attendees, loading, updateAttendee } = useAttendees()
+
+  // Fetch event questions for displaying question text instead of IDs
+  useEffect(() => {
+    const fetchEventQuestions = async () => {
+      try {
+        const response = await fetch(`/api/events/${eventId}/questions`)
+        const data = await response.json()
+        if (data.success && Array.isArray(data.questions)) {
+          const questionsMap = data.questions.reduce((acc: Record<string, string>, q: any) => {
+            acc[q.id] = q.question
+            return acc
+          }, {})
+          setEventQuestions(questionsMap)
+        }
+      } catch (error) {
+        console.error('Failed to fetch event questions:', error)
+      }
+    }
+
+    fetchEventQuestions()
+  }, [eventId])
 
   // Filter and group attendees by status
   const attendeesByStatus = attendees.reduce((acc, attendee) => {
@@ -261,12 +286,17 @@ export function AttendeeManagement({ eventId, requiresApproval }: AttendeeManage
   }
 
   const AttendeeCard = ({ attendee }: { attendee: Attendee }) => {
+    const [showAnswers, setShowAnswers] = useState(false)
     const displayName = attendee.user?.name || attendee.guestName || "Unknown"
     const displayEmail = attendee.user?.email || attendee.guestEmail || ""
     const displayCompany = attendee.user?.company || ""
     const displayJob = attendee.user?.jobTitle || ""
 
     const availableActions = getStatusActions(attendee.status)
+    
+    // Parse application answers if they exist
+    const hasAnswers = attendee.applicationAnswers && Object.keys(attendee.applicationAnswers).length > 0
+    const answers = hasAnswers ? attendee.applicationAnswers : null
     
     return (
       <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-card/50 backdrop-blur-sm">
@@ -406,6 +436,43 @@ export function AttendeeManagement({ eventId, requiresApproval }: AttendeeManage
               )}
             </div>
           </div>
+
+          {/* Application Answers Section */}
+          {hasAnswers && (
+            <div className="mt-4 border-t border-border/50 pt-4">
+              <button
+                onClick={() => setShowAnswers(!showAnswers)}
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors p-2 rounded-md"
+              >
+                <HelpCircle className="h-4 w-4" />
+                Registration Answers
+                {showAnswers ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </button>
+              
+              {showAnswers && (
+                                 <div className="mt-3 space-y-3 bg-muted/30 rounded-lg p-3">
+                   {Object.entries(answers).map(([questionId, answer]) => (
+                     <div key={questionId} className="space-y-1">
+                       <p className="text-sm font-medium text-foreground">
+                         {eventQuestions[questionId] || `Question ${questionId}`}
+                       </p>
+                       <div className="text-sm text-muted-foreground bg-background/50 rounded-md p-2">
+                         {Array.isArray(answer) ? (
+                           <ul className="list-disc list-inside space-y-1">
+                             {answer.map((item, index) => (
+                               <li key={index}>{String(item)}</li>
+                             ))}
+                           </ul>
+                         ) : (
+                           <p>{String(answer) || 'No answer provided'}</p>
+                         )}
+                       </div>
+                     </div>
+                   ))}
+                 </div>
+              )}
+            </div>
+          )}
         </div>
       </Card>
     )

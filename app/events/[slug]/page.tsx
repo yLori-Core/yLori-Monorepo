@@ -1,4 +1,4 @@
-import { getEventBySlug, isEventOrganizer, getUserEventStatus, getEventAttendeesCount } from "@/lib/db/queries"
+import { getEventBySlug, getEventQuestions, isEventOrganizer, getUserEventStatus, getEventAttendeesCount } from "@/lib/db/queries"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/auth"
 import { notFound, redirect } from "next/navigation"
@@ -8,6 +8,9 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { EventForm } from "@/components/event-form"
 import { EventRegistration } from "@/components/event-registration"
+import { EditEventLayout } from "@/components/edit-event-layout"
+import { EventViewTracker } from "@/components/event-view-tracker"
+import { EventShareButton } from "@/components/event-share-button"
 import { handlePublishAction } from "./actions"
 import { type Event } from "@/lib/db/schema"
 import { 
@@ -54,6 +57,9 @@ export default async function EventPage({ params, searchParams }: PageProps) {
   // Get real-time registration count
   const realTimeRegistrationCount = await getEventAttendeesCount(event.id)
   
+  // Get custom questions for registration
+  const customQuestions = await getEventQuestions(event.id)
+  
   // If event is draft and user is not organizer, show not found
   if (event.status === 'draft' && !isOrganizer) {
     notFound()
@@ -87,25 +93,12 @@ export default async function EventPage({ params, searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen bg-background">
+      <EventViewTracker eventId={event.id} isOrganizer={isOrganizer} />
       <Navbar />
       
       <div className="max-w-6xl mx-auto px-6 py-8">
         {isEditMode ? (
-          <>
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h1 className="text-2xl font-bold flex items-center gap-2">
-                  <Edit className="w-6 h-6" />
-                  Edit Event
-                </h1>
-                <p className="text-muted-foreground mt-1">Make changes to your event details</p>
-              </div>
-              <Button asChild variant="outline">
-                <Link href={`/events/${slug}`}>Cancel</Link>
-              </Button>
-            </div>
-            <EventForm initialData={event} />
-          </>
+          <EditEventLayout event={event as any} />
         ) : (
           <>
             {/* Event Header */}
@@ -166,6 +159,13 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                       </Button>
                     </>
                   )}
+                  
+                  {/* Share Button - always visible */}
+                  <EventShareButton 
+                    eventId={event.id}
+                    eventTitle={event.title}
+                    eventSlug={slug}
+                  />
                 </div>
               </div>
             </div>
@@ -274,6 +274,8 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                       slug={slug}
                       isDraft={event.status === 'draft'}
                       ticketType={event.ticketType}
+                      customQuestions={customQuestions as any}
+                      eventTitle={event.title}
                     />
                   </CardContent>
                 </Card>

@@ -1,6 +1,6 @@
 "use server"
 
-import { createEvent } from "@/lib/db/queries"
+import { createEvent, createEventQuestions } from "@/lib/db/queries"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { z } from "zod"
@@ -49,6 +49,17 @@ export async function createEventAction(formData: FormData) {
       coverImage: formData.get('coverImage') ? (formData.get('coverImage') as string) : undefined,
       bannerImage: formData.get('bannerImage') ? (formData.get('bannerImage') as string) : undefined,
       logoImage: formData.get('logoImage') ? (formData.get('logoImage') as string) : undefined,
+    }
+
+    // Extract custom questions
+    const customQuestionsData = formData.get('customQuestions') as string
+    let customQuestions: any[] = []
+    if (customQuestionsData) {
+      try {
+        customQuestions = JSON.parse(customQuestionsData)
+      } catch (error) {
+        console.error('Failed to parse custom questions:', error)
+      }
     }
 
     // Validate the data
@@ -108,6 +119,23 @@ export async function createEventAction(formData: FormData) {
 
     // Create event in database
     const newEvent = await createEvent(eventData)
+
+    // Create custom questions if any
+    if (customQuestions.length > 0) {
+      const validQuestions = customQuestions
+        .filter(q => q.question && q.question.trim())
+        .map((q, index) => ({
+          question: q.question.trim(),
+          questionType: q.questionType || 'text',
+          options: q.options || undefined,
+          isRequired: Boolean(q.isRequired),
+          order: index,
+        }))
+
+      if (validQuestions.length > 0) {
+        await createEventQuestions(newEvent.id, validQuestions)
+      }
+    }
 
     // Revalidate relevant pages
     revalidatePath('/')

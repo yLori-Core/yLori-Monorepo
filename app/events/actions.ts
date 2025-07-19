@@ -1,6 +1,6 @@
 "use server"
 
-import { updateEvent, createEvent, registerForEvent, getUserEventStatus } from "@/lib/db/queries"
+import { updateEvent, createEvent, registerForEvent, getUserEventStatus, updateEventQuestions } from "@/lib/db/queries"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import { redirect } from "next/navigation"
@@ -58,9 +58,41 @@ export async function createEventAction(formData: any) {
   }
 }
 
-export async function updateEventAction(eventId: string, formData: any) {
+export async function updateEventAction(eventId: string, formData: FormData) {
   try {
-    const validatedData = updateEventSchema.parse(formData)
+    // Extract form data
+    const rawData = {
+      title: formData.get('title') as string,
+      description: formData.get('description') ? (formData.get('description') as string) : undefined,
+      startDate: formData.get('startDate') as string,
+      endDate: formData.get('endDate') as string,
+      timezone: formData.get('timezone') as string,
+      eventType: formData.get('eventType') as 'in_person' | 'virtual' | 'hybrid',
+      location: formData.get('location') ? (formData.get('location') as string) : undefined,
+      virtualUrl: formData.get('virtualUrl') ? (formData.get('virtualUrl') as string) : "",
+      capacity: formData.get('capacity') ? parseInt(formData.get('capacity') as string) : undefined,
+      requiresApproval: formData.get('requiresApproval') === 'true',
+      visibility: formData.get('visibility') as 'public' | 'private' | 'unlisted',
+      ticketType: formData.get('ticketType') as 'qr_code' | 'nft',
+      ticketPrice: formData.get('ticketPrice') ? parseFloat(formData.get('ticketPrice') as string) : undefined,
+      currency: formData.get('currency') as string || 'USD',
+      coverImage: formData.get('coverImage') ? (formData.get('coverImage') as string) : undefined,
+      bannerImage: formData.get('bannerImage') ? (formData.get('bannerImage') as string) : undefined,
+      logoImage: formData.get('logoImage') ? (formData.get('logoImage') as string) : undefined,
+    }
+
+    // Extract custom questions
+    const customQuestionsData = formData.get('customQuestions') as string
+    let customQuestions: any[] = []
+    if (customQuestionsData) {
+      try {
+        customQuestions = JSON.parse(customQuestionsData)
+      } catch (error) {
+        console.error('Failed to parse custom questions:', error)
+      }
+    }
+
+    const validatedData = updateEventSchema.parse(rawData)
     
     // Convert date strings to Date objects if provided
     const updateData: any = {
@@ -80,6 +112,21 @@ export async function updateEventAction(eventId: string, formData: any) {
     }
     
     const event = await updateEvent(eventId, updateData)
+
+    // Update custom questions if any
+    if (customQuestions.length >= 0) { // Allow empty array to clear questions
+      const validQuestions = customQuestions
+        .filter(q => q.question && q.question.trim())
+        .map((q, index) => ({
+          question: q.question.trim(),
+          questionType: q.questionType || 'text',
+          options: q.options || undefined,
+          isRequired: Boolean(q.isRequired),
+          order: index,
+        }))
+
+      await updateEventQuestions(eventId, validQuestions)
+    }
     
     revalidatePath(`/events/${event.slug}`)
     revalidatePath('/user/[username]', 'page')

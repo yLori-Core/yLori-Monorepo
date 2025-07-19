@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { TicketQR } from "@/components/ticket-qr"
-import { handleRegisterAction } from "@/app/events/[slug]/actions"
+import { EventRegistrationModal, type EventQuestion } from "@/components/event-registration-modal"
 import Link from "next/link"
 import { UserCheck, AlertCircle, Clock, CheckCircle } from "lucide-react"
 import { Session } from "next-auth"
@@ -16,6 +16,8 @@ interface EventRegistrationProps {
   slug: string
   isDraft: boolean
   ticketType: Event['ticketType']
+  customQuestions: EventQuestion[]
+  eventTitle: string
 }
 
 export function EventRegistration({ 
@@ -25,7 +27,9 @@ export function EventRegistration({
   eventId,
   slug,
   isDraft,
-  ticketType
+  ticketType,
+  customQuestions,
+  eventTitle
 }: EventRegistrationProps) {
   if (isDraft) {
     return (
@@ -95,10 +99,16 @@ export function EventRegistration({
   }
 
   return (
-    <form action={() => handleRegisterAction(eventId, slug)}>
-      <Button type="submit" className="w-full">
-        Register for Event
-      </Button>
-    </form>
+    <EventRegistrationModal
+      questions={customQuestions}
+      eventId={eventId}
+      eventSlug={slug}
+      eventTitle={eventTitle}
+      trigger={
+        <Button className="w-full">
+          Register for Event
+        </Button>
+      }
+    />
   )
 } 

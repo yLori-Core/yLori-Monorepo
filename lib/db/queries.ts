@@ -17,6 +17,7 @@ import {
   type NewUser,
   type NewEventAttendee,
   type NewEventOrganizer,
+  type NewEventQuestion,
   type NewNotification
 } from './schema';
 
@@ -725,6 +726,32 @@ export async function getEventWaitlistCount(eventId: string) {
   return result[0]?.count || 0;
 }
 
+export async function getEventTotalRegistrations(eventId: string) {
+  const result = await db.select({ count: count() })
+    .from(eventAttendees)
+    .where(eq(eventAttendees.eventId, eventId));
+  return result[0]?.count || 0;
+}
+
+// Event engagement tracking
+export async function incrementEventViews(eventId: string) {
+  await db.update(events)
+    .set({ 
+      totalViews: sql`${events.totalViews} + 1`
+    })
+    .where(eq(events.id, eventId));
+}
+
+export async function incrementEventShares(eventId: string) {
+  await db.update(events)
+    .set({ 
+      totalShares: sql`${events.totalShares} + 1`
+    })
+    .where(eq(events.id, eventId));
+}
+
+
+
 // Analytics queries
 export async function trackEventAnalytic(analyticData: {
   eventId: string;
@@ -873,7 +900,7 @@ export async function getEventDashboardData(eventId: string) {
     recentRegistrations
   ] = await Promise.all([
     getEventWithDetails(eventId),
-    getEventAttendeesCount(eventId),
+    getEventTotalRegistrations(eventId),
     db.select({ count: count() }).from(eventAttendees).where(and(eq(eventAttendees.eventId, eventId), eq(eventAttendees.status, 'approved'))),
     db.select({ count: count() }).from(eventAttendees).where(and(eq(eventAttendees.eventId, eventId), eq(eventAttendees.status, 'pending'))),
     getEventWaitlistCount(eventId),
@@ -909,3 +936,112 @@ export async function searchUsers(query: string) {
   ))
   .limit(10);
 } 
+
+// Event Questions queries
+export async function createEventQuestions(eventId: string, questions: {
+  question: string;
+  questionType: 'text' | 'textarea' | 'select' | 'multiselect' | 'checkbox' | 'radio';
+  options?: string[];
+  isRequired: boolean;
+  order: number;
+}[]) {
+  const user = await requireAuth();
+  
+  // Verify user is an organizer
+  await requireEventOrganizer(eventId);
+  
+  if (questions.length === 0) return [];
+
+  const questionData = questions.map(q => ({
+    eventId,
+    question: q.question,
+    questionType: q.questionType,
+    options: q.options ? JSON.stringify(q.options) : null,
+    isRequired: q.isRequired,
+    order: q.order,
+    isActive: true,
+  }));
+
+  const result = await db.insert(eventQuestions).values(questionData).returning();
+  return result;
+}
+
+export async function getEventQuestions(eventId: string) {
+  return await db.select({
+    id: eventQuestions.id,
+    eventId: eventQuestions.eventId,
+    question: eventQuestions.question,
+    questionType: eventQuestions.questionType,
+    options: eventQuestions.options,
+    isRequired: eventQuestions.isRequired,
+    order: eventQuestions.order,
+    isActive: eventQuestions.isActive,
+    createdAt: eventQuestions.createdAt,
+  })
+  .from(eventQuestions)
+  .where(and(
+    eq(eventQuestions.eventId, eventId),
+    eq(eventQuestions.isActive, true)
+  ))
+  .orderBy(asc(eventQuestions.order));
+}
+
+export async function updateEventQuestions(eventId: string, questions: {
+  id?: string;
+  question: string;
+  questionType: 'text' | 'textarea' | 'select' | 'multiselect' | 'checkbox' | 'radio';
+  options?: string[];
+  isRequired: boolean;
+  order: number;
+}[]) {
+  const user = await requireAuth();
+  
+  // Verify user is an organizer
+  await requireEventOrganizer(eventId);
+
+  // First, deactivate all existing questions for this event
+  await db.update(eventQuestions)
+    .set({ isActive: false })
+    .where(eq(eventQuestions.eventId, eventId));
+
+  // Then create new questions
+  if (questions.length > 0) {
+    const questionData = questions.map(q => ({
+      eventId,
+      question: q.question,
+      questionType: q.questionType,
+      options: q.options ? JSON.stringify(q.options) : null,
+      isRequired: q.isRequired,
+      order: q.order,
+      isActive: true,
+    }));
+
+    await db.insert(eventQuestions).values(questionData);
+  }
+
+  return await getEventQuestions(eventId);
+}
+
+export async function deleteEventQuestion(questionId: string) {
+  const user = await requireAuth();
+  
+  // Get the question to check event ownership
+  const question = await db.select()
+    .from(eventQuestions)
+    .where(eq(eventQuestions.id, questionId))
+    .limit(1);
+    
+  if (!question.length) {
+    throw new Error('Question not found');
+  }
+  
+  // Verify user is an organizer of the event
+  await requireEventOrganizer(question[0].eventId);
+  
+  const result = await db.update(eventQuestions)
+    .set({ isActive: false })
+    .where(eq(eventQuestions.id, questionId))
+    .returning();
+    
+  return result[0];
+}
