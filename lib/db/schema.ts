@@ -1,5 +1,5 @@
 import { pgTable, text, timestamp, boolean, integer, uuid, varchar, json, decimal, pgEnum, uniqueIndex, index } from 'drizzle-orm/pg-core';
-import { sql } from 'drizzle-orm';
+import { sql, desc } from 'drizzle-orm';
 import { relations } from 'drizzle-orm';
 
 // Enums
@@ -517,6 +517,198 @@ export type EventCategory = typeof eventCategories.$inferSelect;
 export type NewEventCategory = typeof eventCategories.$inferInsert;
 export type EventQuestion = typeof eventQuestions.$inferSelect;
 export type NewEventQuestion = typeof eventQuestions.$inferInsert;
+// Points System Tables
+
+// User Points Summary
+export const userPoints = pgTable('user_points', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  totalPoints: integer('total_points').notNull().default(0),
+  lifetimePoints: integer('lifetime_points').notNull().default(0),
+  currentLevel: integer('current_level').notNull().default(1),
+  levelProgress: integer('level_progress').notNull().default(0),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  userIdUnique: uniqueIndex('user_points_user_id_unique').on(table.userId),
+  totalPointsIdx: index('idx_user_points_total_points').on(desc(table.totalPoints)),
+  levelIdx: index('idx_user_points_level').on(desc(table.currentLevel)),
+}));
+
+// Points Transactions Audit Trail
+export const pointsTransactionTypeEnum = pgEnum('transaction_type', [
+  'event_create', 'event_publish', 'event_complete', 'event_register', 'event_checkin', 
+  'event_complete_attend', 'early_bird', 'profile_complete', 'first_event_create', 
+  'first_event_attend', 'event_share', 'event_review', 'invite_friend', 'custom_questions',
+  'weekly_active', 'attendee_milestone_10', 'attendee_milestone_25', 'attendee_milestone_50', 
+  'attendee_milestone_100', 'organizer_checkin_bonus', 'manual_adjustment', 'achievement_bonus'
+]);
+
+export const pointsTransactionStatusEnum = pgEnum('transaction_status', [
+  'completed', 'pending', 'cancelled', 'flagged'
+]);
+
+export const pointsTransactions = pgTable('points_transactions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  eventId: uuid('event_id').references(() => events.id, { onDelete: 'set null' }),
+  pointsEarned: integer('points_earned').notNull(),
+  transactionType: pointsTransactionTypeEnum('transaction_type').notNull(),
+  description: text('description').notNull(),
+  metadata: json('metadata').default({}),
+  riskScore: integer('risk_score').default(0),
+  status: pointsTransactionStatusEnum('status').default('completed'),
+  createdAt: timestamp('created_at').defaultNow(),
+}, (table) => ({
+  userIdIdx: index('idx_points_transactions_user_id').on(table.userId),
+  eventIdIdx: index('idx_points_transactions_event_id').on(table.eventId),
+  typeIdx: index('idx_points_transactions_type').on(table.transactionType),
+  createdAtIdx: index('idx_points_transactions_created_at').on(table.createdAt),
+  statusIdx: index('idx_points_transactions_status').on(table.status),
+}));
+
+// User Security & Risk Assessment
+export const verificationLevelEnum = pgEnum('verification_level', [
+  'none', 'email', 'phone', 'social', 'id', 'kyc'
+]);
+
+export const manualReviewStatusEnum = pgEnum('manual_review_status', [
+  'none', 'pending', 'approved', 'rejected'
+]);
+
+export const userSecurity = pgTable('user_security', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  riskScore: integer('risk_score').notNull().default(0),
+  verificationLevel: verificationLevelEnum('verification_level').notNull().default('none'),
+  redFlags: json('red_flags').default([]),
+  deviceFingerprints: json('device_fingerprints').default([]),
+  ipAddresses: json('ip_addresses').default([]),
+  lastRiskAssessment: timestamp('last_risk_assessment').defaultNow(),
+  manualReviewStatus: manualReviewStatusEnum('manual_review_status').default('none'),
+  manualReviewNotes: text('manual_review_notes'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  userIdUnique: uniqueIndex('user_security_user_id_unique').on(table.userId),
+  riskScoreIdx: index('idx_user_security_risk_score').on(table.riskScore),
+  verificationLevelIdx: index('idx_user_security_verification_level').on(table.verificationLevel),
+}));
+
+// Points Rules Configuration
+export const pointsRules = pgTable('points_rules', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  ruleType: varchar('rule_type', { length: 50 }).notNull(),
+  ruleName: varchar('rule_name', { length: 100 }).notNull(),
+  basePoints: integer('base_points').notNull(),
+  multiplierConditions: json('multiplier_conditions').default({}),
+  verificationLevelRequired: verificationLevelEnum('verification_level_required').default('none'),
+  maxDailyEarnings: integer('max_daily_earnings'),
+  maxPerEvent: integer('max_per_event'),
+  isActive: boolean('is_active').notNull().default(true),
+  description: text('description'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  ruleTypeUnique: uniqueIndex('points_rules_rule_type_unique').on(table.ruleType),
+  activeIdx: index('idx_points_rules_active').on(table.isActive),
+  typeIdx: index('idx_points_rules_type').on(table.ruleType),
+}));
+
+// User Achievements & Badges
+export const achievementTypeEnum = pgEnum('achievement_type', [
+  'first_steps', 'profile_complete', 'first_event_create', 'first_event_attend',
+  'host_hero', 'social_butterfly', 'early_bird', 'community_leader', 'streak_master',
+  'event_creator', 'super_attendee', 'point_collector', 'level_achiever'
+]);
+
+export const userAchievements = pgTable('user_achievements', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  achievementType: achievementTypeEnum('achievement_type').notNull(),
+  achievementName: varchar('achievement_name', { length: 100 }).notNull(),
+  description: text('description'),
+  pointsEarned: integer('points_earned').default(0),
+  metadata: json('metadata').default({}),
+  achievedAt: timestamp('achieved_at').defaultNow(),
+}, (table) => ({
+  userAchievementUnique: uniqueIndex('user_achievements_user_achievement_unique').on(table.userId, table.achievementType),
+  userIdIdx: index('idx_user_achievements_user_id').on(table.userId),
+  typeIdx: index('idx_user_achievements_type').on(table.achievementType),
+  achievedAtIdx: index('idx_user_achievements_achieved_at').on(table.achievedAt),
+}));
+
+// Token Redemptions (Future Use)
+export const redemptionStatusEnum = pgEnum('redemption_status', [
+  'pending', 'approved', 'rejected', 'completed', 'cancelled'
+]);
+
+export const tokenRedemptions = pgTable('token_redemptions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  pointsRedeemed: integer('points_redeemed').notNull(),
+  tokensIssued: decimal('tokens_issued', { precision: 18, scale: 8 }),
+  exchangeRate: decimal('exchange_rate', { precision: 10, scale: 6 }),
+  verificationLevelUsed: verificationLevelEnum('verification_level_used').notNull(),
+  riskScoreAtRedemption: integer('risk_score_at_redemption').notNull(),
+  manualReviewRequired: boolean('manual_review_required').default(false),
+  status: redemptionStatusEnum('status').default('pending'),
+  transactionHash: varchar('transaction_hash', { length: 66 }),
+  rejectionReason: text('rejection_reason'),
+  processedBy: text('processed_by').references(() => users.id),
+  requestedAt: timestamp('requested_at').defaultNow(),
+  processedAt: timestamp('processed_at'),
+}, (table) => ({
+  userIdIdx: index('idx_token_redemptions_user_id').on(table.userId),
+  statusIdx: index('idx_token_redemptions_status').on(table.status),
+  requestedAtIdx: index('idx_token_redemptions_requested_at').on(table.requestedAt),
+}));
+
+// Relations for Points System
+export const userPointsRelations = relations(userPoints, ({ one }) => ({
+  user: one(users, {
+    fields: [userPoints.userId],
+    references: [users.id],
+  }),
+}));
+
+export const pointsTransactionsRelations = relations(pointsTransactions, ({ one }) => ({
+  user: one(users, {
+    fields: [pointsTransactions.userId],
+    references: [users.id],
+  }),
+  event: one(events, {
+    fields: [pointsTransactions.eventId],
+    references: [events.id],
+  }),
+}));
+
+export const userSecurityRelations = relations(userSecurity, ({ one }) => ({
+  user: one(users, {
+    fields: [userSecurity.userId],
+    references: [users.id],
+  }),
+}));
+
+export const userAchievementsRelations = relations(userAchievements, ({ one }) => ({
+  user: one(users, {
+    fields: [userAchievements.userId],
+    references: [users.id],
+  }),
+}));
+
+export const tokenRedemptionsRelations = relations(tokenRedemptions, ({ one }) => ({
+  user: one(users, {
+    fields: [tokenRedemptions.userId],
+    references: [users.id],
+  }),
+  processedBy: one(users, {
+    fields: [tokenRedemptions.processedBy],
+    references: [users.id],
+  }),
+}));
+
+// Type exports
 export type EventUpdate = typeof eventUpdates.$inferSelect;
 export type NewEventUpdate = typeof eventUpdates.$inferInsert;
 export type EventAnalytic = typeof eventAnalytics.$inferSelect;
@@ -526,4 +718,18 @@ export type NewNotification = typeof notifications.$inferInsert;
 export type UserFollow = typeof userFollows.$inferSelect;
 export type NewUserFollow = typeof userFollows.$inferInsert;
 export type EventReview = typeof eventReviews.$inferSelect;
-export type NewEventReview = typeof eventReviews.$inferInsert; 
+export type NewEventReview = typeof eventReviews.$inferInsert;
+
+// Points System Types
+export type UserPoints = typeof userPoints.$inferSelect;
+export type NewUserPoints = typeof userPoints.$inferInsert;
+export type PointsTransaction = typeof pointsTransactions.$inferSelect;
+export type NewPointsTransaction = typeof pointsTransactions.$inferInsert;
+export type UserSecurity = typeof userSecurity.$inferSelect;
+export type NewUserSecurity = typeof userSecurity.$inferInsert;
+export type PointsRule = typeof pointsRules.$inferSelect;
+export type NewPointsRule = typeof pointsRules.$inferInsert;
+export type UserAchievement = typeof userAchievements.$inferSelect;
+export type NewUserAchievement = typeof userAchievements.$inferInsert;
+export type TokenRedemption = typeof tokenRedemptions.$inferSelect;
+export type NewTokenRedemption = typeof tokenRedemptions.$inferInsert; 

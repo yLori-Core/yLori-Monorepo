@@ -1,4 +1,4 @@
-import { eq, desc, and, count, or, asc, sql, inArray } from 'drizzle-orm';
+import { eq, desc, and, count, or, asc, sql, inArray, gte } from 'drizzle-orm';
 import { db } from './index';
 import crypto from 'crypto';
 import { getServerSession } from 'next-auth';
@@ -13,12 +13,20 @@ import {
   notifications,
   eventReviews,
   userFollows,
+  userPoints,
+  pointsTransactions,
+  userSecurity,
+  pointsRules,
+  userAchievements,
   type NewEvent, 
   type NewUser,
   type NewEventAttendee,
   type NewEventOrganizer,
   type NewEventQuestion,
-  type NewNotification
+  type NewNotification,
+  type NewPointsTransaction,
+  type NewUserSecurity,
+  type NewUserAchievement
 } from './schema';
 
 // Session and authorization utilities
@@ -225,7 +233,52 @@ export async function createEvent(eventData: Omit<NewEvent, 'createdById'>) {
   };
   
   const result = await db.insert(events).values(eventWithCreator).returning();
+  
+  // No points awarded for event creation - points only for check-ins
+  
   return result[0];
+}
+
+// Points awarding functions for event actions
+async function awardEventCreationPoints(userId: string, eventId: string) {
+  try {
+    // Check if this is user's first event
+    const existingCreations = await getUserEventCreationCount(userId);
+    const isFirstEvent = existingCreations === 0;
+    
+    // Get points rules from database
+    const createRule = await getPointsRule('event_create');
+    const firstEventRule = await getPointsRule('first_event_create');
+    
+    // Award base creation points
+    if (createRule) {
+      await createPointsTransaction({
+        userId,
+        eventId,
+        pointsEarned: createRule.basePoints,
+        transactionType: 'event_create',
+        description: 'Points for creating a new event',
+        metadata: { eventId },
+        status: 'completed'
+      });
+    }
+    
+    // Award first event bonus
+    if (isFirstEvent && firstEventRule) {
+      await createPointsTransaction({
+        userId,
+        eventId,
+        pointsEarned: firstEventRule.basePoints,
+        transactionType: 'first_event_create',
+        description: 'First-time event creation bonus',
+        metadata: { eventId, isFirstEvent: true },
+        status: 'completed'
+      });
+    }
+  } catch (error) {
+    console.error('Error awarding event creation points:', error);
+    // Don't throw - points failure shouldn't break event creation
+  }
 }
 
 export async function getEventById(id: string) {
@@ -495,8 +548,12 @@ export async function registerForEvent(eventId: string, guestData?: {
       .where(eq(events.id, eventId));
   }
   
+  // Points are no longer awarded for registration - only for check-ins
+  
   return result[0];
 }
+
+
 
 export async function getEventAttendeesByStatus(eventId: string, status?: ('pending' | 'approved' | 'waitlisted' | 'declined' | 'cancelled' | 'checked_in' | 'no_show')[]) {
   const whereConditions = [eq(eventAttendees.eventId, eventId)];
@@ -566,8 +623,8 @@ export async function approveAttendee(eventId: string, attendeeId: string) {
     throw new Error('Attendee not found');
   }
   
-  if (attendee[0].status !== 'pending') {
-    throw new Error('Attendee is not in pending status');
+  if (attendee[0].status !== 'pending' && attendee[0].status !== 'waitlisted') {
+    throw new Error('Attendee must be in pending or waitlisted status to be approved');
   }
   
   // Check event capacity before approving
@@ -670,7 +727,57 @@ export async function checkInAttendee(eventId: string, attendeeId: string) {
       eq(eventAttendees.eventId, eventId)
     ))
     .returning();
+  
+  // Award points for check-in to both attendee and organizer
+  if (result[0] && attendee[0].userId) {
+    await awardEventCheckInPoints(attendee[0].userId, eventId);
+    // Award bonus points to organizer for successful check-in
+    await awardOrganizerCheckInBonus(organizer.id, eventId);
+  }
+  
   return result[0];
+}
+
+// Award points for event check-in (attendee)
+async function awardEventCheckInPoints(userId: string, eventId: string) {
+  try {
+    const checkinRule = await getPointsRule('event_checkin');
+    if (checkinRule) {
+      await createPointsTransaction({
+        userId,
+        eventId,
+        pointsEarned: checkinRule.basePoints,
+        transactionType: 'event_checkin',
+        description: 'Points for attendee checking into an event',
+        metadata: { eventId },
+        status: 'completed'
+      });
+    }
+  } catch (error) {
+    console.error('Error awarding attendee check-in points:', error);
+    // Don't throw - points failure shouldn't break check-in
+  }
+}
+
+// Award bonus points to organizer when attendee checks in
+async function awardOrganizerCheckInBonus(organizerId: string, eventId: string) {
+  try {
+    const bonusRule = await getPointsRule('organizer_checkin_bonus');
+    if (bonusRule) {
+      await createPointsTransaction({
+        userId: organizerId,
+        eventId,
+        pointsEarned: bonusRule.basePoints,
+        transactionType: 'organizer_checkin_bonus',
+        description: 'Organizer bonus for attendee check-in',
+        metadata: { eventId },
+        status: 'completed'
+      });
+    }
+  } catch (error) {
+    console.error('Error awarding organizer check-in bonus:', error);
+    // Don't throw - points failure shouldn't break check-in
+  }
 }
 
 export async function getUserEventStatus(eventId: string, userId: string) {
@@ -1043,5 +1150,284 @@ export async function deleteEventQuestion(questionId: string) {
     .where(eq(eventQuestions.id, questionId))
     .returning();
     
+  return result[0] || null;
+}
+
+// Points System Queries
+
+export async function getUserPointsSummary(userId: string) {
+  const result = await db.select()
+    .from(userPoints)
+    .where(eq(userPoints.userId, userId))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+export async function createPointsTransaction(data: NewPointsTransaction) {
+  const result = await db.insert(pointsTransactions)
+    .values(data)
+    .returning();
+  
+  // Update or create user_points summary record
+  if (result[0] && data.status === 'completed') {
+    await updateUserPointsSummary(data.userId, data.pointsEarned);
+  }
+  
   return result[0];
+}
+
+// Helper function to update user points summary
+async function updateUserPointsSummary(userId: string, pointsEarned: number) {
+  try {
+    // Try to update existing record
+    const existing = await db.select()
+      .from(userPoints)
+      .where(eq(userPoints.userId, userId))
+      .limit(1);
+    
+    if (existing.length > 0) {
+      // Update existing record
+      const newTotalPoints = existing[0].totalPoints + pointsEarned;
+      const newLevel = Math.max(1, Math.floor(newTotalPoints / 100) + 1);
+      const levelProgress = newTotalPoints % 100;
+      
+      await db.update(userPoints)
+        .set({
+          totalPoints: newTotalPoints,
+          lifetimePoints: existing[0].lifetimePoints + pointsEarned,
+          currentLevel: newLevel,
+          levelProgress: levelProgress,
+          updatedAt: new Date()
+        })
+        .where(eq(userPoints.userId, userId));
+    } else {
+      // Create new record
+      const newLevel = Math.max(1, Math.floor(pointsEarned / 100) + 1);
+      const levelProgress = pointsEarned % 100;
+      
+      await db.insert(userPoints).values({
+        userId,
+        totalPoints: pointsEarned,
+        lifetimePoints: pointsEarned,
+        currentLevel: newLevel,
+        levelProgress: levelProgress
+      });
+    }
+  } catch (error) {
+    console.error('Error updating user points summary:', error);
+    // Don't throw - points summary failure shouldn't break the transaction
+  }
+}
+
+export async function getUserPointsTransactions(userId: string, limit = 50, offset = 0) {
+  return await db.select()
+    .from(pointsTransactions)
+    .where(eq(pointsTransactions.userId, userId))
+    .orderBy(desc(pointsTransactions.createdAt))
+    .limit(limit)
+    .offset(offset);
+}
+
+export async function getPointsLeaderboard(limit = 100) {
+  return await db.select({
+    userId: userPoints.userId,
+    totalPoints: userPoints.totalPoints,
+    currentLevel: userPoints.currentLevel,
+    lifetimePoints: userPoints.lifetimePoints
+  })
+  .from(userPoints)
+  .orderBy(desc(userPoints.totalPoints))
+  .limit(limit);
+}
+
+export async function getUserAchievements(userId: string) {
+  return await db.select()
+    .from(userAchievements)
+    .where(eq(userAchievements.userId, userId))
+    .orderBy(desc(userAchievements.achievedAt));
+}
+
+export async function createUserAchievement(data: NewUserAchievement) {
+  const result = await db.insert(userAchievements)
+    .values(data)
+    .returning();
+  
+  return result[0];
+}
+
+export async function getPointsRules() {
+  return await db.select()
+    .from(pointsRules)
+    .where(eq(pointsRules.isActive, true))
+    .orderBy(pointsRules.ruleType);
+}
+
+export async function getPointsRule(ruleType: string) {
+  const result = await db.select()
+    .from(pointsRules)
+    .where(and(
+      eq(pointsRules.ruleType, ruleType),
+      eq(pointsRules.isActive, true)
+    ))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+export async function getUserSecurity(userId: string) {
+  const result = await db.select()
+    .from(userSecurity)
+    .where(eq(userSecurity.userId, userId))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+export async function updateUserSecurity(userId: string, updates: Partial<NewUserSecurity>) {
+  const result = await db.update(userSecurity)
+    .set({
+      ...updates,
+      updatedAt: new Date()
+    })
+    .where(eq(userSecurity.userId, userId))
+    .returning();
+  
+  return result[0];
+}
+
+export async function getRecentTransactionsByUser(userId: string, hours = 24) {
+  return await db.select()
+    .from(pointsTransactions)
+    .where(and(
+      eq(pointsTransactions.userId, userId),
+      gte(pointsTransactions.createdAt, sql`NOW() - INTERVAL '${hours} hours'`)
+    ))
+    .orderBy(desc(pointsTransactions.createdAt));
+}
+
+export async function getDailyPointsEarned(userId: string, date?: Date) {
+  const targetDate = date || new Date();
+  const result = await db.select({
+    total: sql<number>`COALESCE(SUM(${pointsTransactions.pointsEarned}), 0)`
+  })
+  .from(pointsTransactions)
+  .where(and(
+    eq(pointsTransactions.userId, userId),
+    eq(pointsTransactions.status, 'completed'),
+    sql`DATE(${pointsTransactions.createdAt}) = DATE(${targetDate.toISOString()})`
+  ));
+  
+  return Number(result[0]?.total || 0);
+}
+
+export async function getEventPointsEarned(userId: string, eventId: string) {
+  const result = await db.select({
+    total: sql<number>`COALESCE(SUM(${pointsTransactions.pointsEarned}), 0)`
+  })
+  .from(pointsTransactions)
+  .where(and(
+    eq(pointsTransactions.userId, userId),
+    eq(pointsTransactions.eventId, eventId),
+    eq(pointsTransactions.status, 'completed')
+  ));
+  
+  return Number(result[0]?.total || 0);
+}
+
+export async function hasUserEarnedTransactionType(userId: string, transactionType: string) {
+  const result = await db.select()
+    .from(pointsTransactions)
+    .where(and(
+      eq(pointsTransactions.userId, userId),
+      eq(pointsTransactions.transactionType, transactionType as any),
+      eq(pointsTransactions.status, 'completed')
+    ))
+    .limit(1);
+  
+  return result.length > 0;
+}
+
+export async function getUserEventCreationCount(userId: string) {
+  const result = await db.select({ count: count() })
+    .from(pointsTransactions)
+    .where(and(
+      eq(pointsTransactions.userId, userId),
+      eq(pointsTransactions.transactionType, 'event_create'),
+      eq(pointsTransactions.status, 'completed')
+    ));
+  
+  return result[0]?.count || 0;
+}
+
+export async function getUserEventAttendanceCount(userId: string) {
+  const result = await db.select({ count: count() })
+    .from(pointsTransactions)
+    .where(and(
+      eq(pointsTransactions.userId, userId),
+      eq(pointsTransactions.transactionType, 'event_checkin'),
+      eq(pointsTransactions.status, 'completed')
+    ));
+  
+  return result[0]?.count || 0;
+}
+
+export async function getTopPointEarners(timeframe: 'week' | 'month' | 'all' = 'all', limit = 10) {
+  let dateFilter = sql`TRUE`;
+  
+  if (timeframe === 'week') {
+    dateFilter = sql`${pointsTransactions.createdAt} >= NOW() - INTERVAL '7 days'`;
+  } else if (timeframe === 'month') {
+    dateFilter = sql`${pointsTransactions.createdAt} >= NOW() - INTERVAL '30 days'`;
+  }
+
+  if (timeframe === 'all') {
+    return await db.select({
+      userId: userPoints.userId,
+      totalPoints: userPoints.totalPoints,
+      currentLevel: userPoints.currentLevel
+    })
+    .from(userPoints)
+    .orderBy(desc(userPoints.totalPoints))
+    .limit(limit);
+  } else {
+    return await db.select({
+      userId: pointsTransactions.userId,
+      totalPoints: sql<number>`SUM(${pointsTransactions.pointsEarned})`,
+      transactionCount: sql<number>`COUNT(*)`
+    })
+    .from(pointsTransactions)
+    .where(and(
+      eq(pointsTransactions.status, 'completed'),
+      dateFilter
+    ))
+    .groupBy(pointsTransactions.userId)
+    .orderBy(desc(sql`SUM(${pointsTransactions.pointsEarned})`))
+    .limit(limit);
+  }
+}
+
+export async function getPlatformPointsStats() {
+  const [totalStats, userStats] = await Promise.all([
+    db.select({
+      totalPointsAwarded: sql<number>`COALESCE(SUM(${pointsTransactions.pointsEarned}), 0)`,
+      totalTransactions: sql<number>`COUNT(*)`
+    })
+    .from(pointsTransactions)
+    .where(eq(pointsTransactions.status, 'completed')),
+    
+    db.select({
+      activeUsers: sql<number>`COUNT(*)`,
+      averageLevel: sql<number>`AVG(${userPoints.currentLevel})`
+    })
+    .from(userPoints)
+    .where(gte(userPoints.totalPoints, 1))
+  ]);
+
+  return {
+    totalPointsAwarded: Number(totalStats[0]?.totalPointsAwarded || 0),
+    totalTransactions: Number(totalStats[0]?.totalTransactions || 0),
+    activeUsers: Number(userStats[0]?.activeUsers || 0),
+    averageUserLevel: Number(userStats[0]?.averageLevel || 1)
+  };
 }

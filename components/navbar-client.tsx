@@ -17,28 +17,19 @@ import { Calendar, Search, Bell, Globe, User } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { AuthModal } from "@/components/auth-modal";
 import { SignOutButton } from "@/components/sign-out-button";
+import { PointsIndicatorServer } from "@/components/points-indicator-server";
 import { signOut } from "next-auth/react";
+import type { UserPoints } from "@/lib/db/schema";
 
 interface NavbarClientProps {
   session: any;
+  userPoints: UserPoints | null;
 }
 
-export function NavbarClient({ session }: NavbarClientProps) {
-  const [userImage, setUserImage] = useState<string | null>(null);
+export function NavbarClient({ session, userPoints }: NavbarClientProps) {
   const [currentTime, setCurrentTime] = useState<string>("");
 
   useEffect(() => {
-    // Debug session data
-    if (session?.user) {
-      console.log("Session user data:", session.user);
-      console.log("User image URL:", session.user.image);
-      
-      // Set user image with proper URL handling
-      if (session.user.image) {
-        setUserImage(session.user.image);
-      }
-    }
-    
     // Set up current time with timezone
     const updateTime = () => {
       const now = new Date();
@@ -56,7 +47,7 @@ export function NavbarClient({ session }: NavbarClientProps) {
     const interval = setInterval(updateTime, 60000); // Update every minute
     
     return () => clearInterval(interval);
-  }, [session]);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/' });
@@ -125,19 +116,19 @@ export function NavbarClient({ session }: NavbarClientProps) {
             </div>
             
             {/* Desktop Auth */}
-            <div className="hidden sm:block">
+            <div className="hidden sm:flex items-center space-x-3">
               {session?.user ? (
-                <DropdownMenu>
+                <>
+                  <PointsIndicatorServer userPoints={userPoints} className="px-2 py-1 rounded-md bg-primary/5" />
+                  <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="relative w-8 h-8 rounded-full">
                       <Avatar className="w-8 h-8 ring-2 ring-[#9b6fb5]/20">
-                        {userImage ? (
-                          <AvatarImage 
-                            src={userImage} 
-                            alt={session.user.name || "User"} 
-                            referrerPolicy="no-referrer"
-                          />
-                        ) : null}
+                        <AvatarImage 
+                          src={session.user.image || ""} 
+                          alt={session.user.name || "User"} 
+                          referrerPolicy="no-referrer"
+                        />
                         <AvatarFallback className="text-xs bg-[#9b6fb5]/20 text-[#9b6fb5]">
                           {getAvatarFallback(session.user)}
                         </AvatarFallback>
@@ -168,6 +159,7 @@ export function NavbarClient({ session }: NavbarClientProps) {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
+                </>
               ) : (
                 <AuthModal>
                   <Button className="bg-[#9b6fb5] hover:bg-[#8a5ea4] text-white font-medium px-4 py-2 h-9 text-sm shadow-sm">
@@ -184,17 +176,17 @@ export function NavbarClient({ session }: NavbarClientProps) {
               </span>
               
               {session?.user ? (
+                <>
+                  <PointsIndicatorServer userPoints={userPoints} className="px-2 py-1 rounded-md bg-primary/5" />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="relative w-8 h-8 rounded-full p-0">
                       <Avatar className="w-8 h-8 ring-2 ring-[#9b6fb5]/20">
-                        {userImage ? (
-                          <AvatarImage 
-                            src={userImage} 
-                            alt={session.user.name || "User"} 
-                            referrerPolicy="no-referrer"
-                          />
-                        ) : null}
+                        <AvatarImage 
+                          src={session.user.image || ""} 
+                          alt={session.user.name || "User"} 
+                          referrerPolicy="no-referrer"
+                        />
                         <AvatarFallback className="text-xs bg-[#9b6fb5]/20 text-[#9b6fb5]">
                           {getAvatarFallback(session.user)}
                         </AvatarFallback>
@@ -252,6 +244,7 @@ export function NavbarClient({ session }: NavbarClientProps) {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
+                </>
               ) : (
                 <AuthModal>
                   <Button className="bg-[#9b6fb5] hover:bg-[#8a5ea4] text-white font-medium px-3 py-1 h-8 text-xs shadow-sm">

@@ -25,8 +25,8 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { AttendeeManagement } from "@/components/attendee-management"
-import { EventManagement } from "./event-management"
 import { AttendeeProvider } from "@/components/providers/attendee-provider"
+import { QRScannerButton } from "@/components/qr-scanner-button"
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -88,7 +88,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             </div>
             
             <div className="flex items-center gap-3">
-              <EventManagement event={event} />
+              <QRScannerButton eventId={event.id} />
               <Button asChild variant="outline" size="sm">
                 <Link href={`/events/${slug}?edit=true`} className="flex items-center gap-2">
                   <Settings className="w-4 h-4" />

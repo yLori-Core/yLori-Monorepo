@@ -29,6 +29,27 @@
       "when": 1752659460845,
       "tag": "0003_elite_midnight",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1753184689142,
+      "tag": "0004_chubby_legion",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1753184887769,
+      "tag": "0005_shocking_gauntlet",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1753187716293,
+      "tag": "0006_jazzy_tag",
+      "breakpoints": true
     }
   ]
 }

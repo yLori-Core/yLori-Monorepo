@@ -144,7 +144,22 @@ export function AttendeeManagement({ eventId, requiresApproval }: AttendeeManage
   }, [eventId])
 
   // Filter and group attendees by status
-  const attendeesByStatus = attendees.reduce((acc, attendee) => {
+  const filteredAttendees = attendees.filter(attendee => {
+    if (!searchTerm) return true
+    
+    const searchLower = searchTerm.toLowerCase()
+    const user = attendee.user
+    
+    return (
+      user?.name?.toLowerCase().includes(searchLower) ||
+      user?.email?.toLowerCase().includes(searchLower) ||
+      user?.company?.toLowerCase().includes(searchLower) ||
+      attendee.guestName?.toLowerCase().includes(searchLower) ||
+      attendee.guestEmail?.toLowerCase().includes(searchLower)
+    )
+  })
+
+  const attendeesByStatus = filteredAttendees.reduce((acc, attendee) => {
     const status = attendee.status as AttendeeStatus
     if (!acc[status]) {
       acc[status] = []
@@ -152,6 +167,13 @@ export function AttendeeManagement({ eventId, requiresApproval }: AttendeeManage
     acc[status].push(attendee)
     return acc
   }, {} as Record<AttendeeStatus, Attendee[]>)
+
+  // Ensure all status arrays exist
+  Object.values(ATTENDEE_STATUS).forEach(status => {
+    if (!attendeesByStatus[status]) {
+      attendeesByStatus[status] = []
+    }
+  })
 
   // Initialize empty arrays for each status if not present
   const statuses: AttendeeStatus[] = attendeeStatusEnum.enumValues
@@ -167,6 +189,8 @@ export function AttendeeManagement({ eventId, requiresApproval }: AttendeeManage
       setActiveTab(value)
     }
   }
+
+
 
   // Set initial active tab to first non-empty section
   useEffect(() => {
