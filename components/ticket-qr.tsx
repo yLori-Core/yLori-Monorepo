@@ -30,12 +30,17 @@ export function TicketQR({ email, eventId, eventName, eventDate }: TicketQRProps
   // Generate encrypted data on mount
   useEffect(() => {
     async function generateTicket() {
-      const result = await generateTicketData(email, eventId);
-      if (result.success && result.data) {
-        setEncryptedData(result.data);
-      } else {
-        setError(result.error || 'Failed to generate ticket');
-        console.error('Failed to generate ticket:', result.error);
+      try {
+        const result = await generateTicketData(email, eventId);
+        if (result.success && result.data) {
+          setEncryptedData(result.data);
+        } else {
+          setError(result.error || 'Failed to generate ticket');
+          console.error('Failed to generate ticket:', result.error);
+        }
+      } catch (error) {
+        console.error('Error generating ticket:', error);
+        setError('Unable to generate ticket QR code');
       }
     }
     generateTicket();

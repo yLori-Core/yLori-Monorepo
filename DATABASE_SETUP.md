@@ -124,7 +124,26 @@ GOOGLE_ID="your_google_oauth_client_id"
 GOOGLE_SECRET="your_google_oauth_client_secret"
 GITHUB_ID="your_github_oauth_client_id"
 GITHUB_SECRET="your_github_oauth_client_secret"
+
+# QR Code Encryption (Required for ticket check-in functionality)
+# Generate a 32-byte (64 character) hex string for encryption
+# Example: openssl rand -hex 32
+ENCRYPTION_KEY="your_64_character_hex_encryption_key"
 ```
+
+### QR Code Security
+
+The QR codes generated for event tickets are encrypted using AES-256-ECB encryption. Only the `ENCRYPTION_KEY` server-side environment variable is needed - all encryption and decryption happens securely on the server.
+
+To generate a secure key:
+```bash
+openssl rand -hex 32
+```
+
+**Important**: 
+- Keep this key secure and never expose it to the client-side
+- Use the same key across all environments (dev, staging, production)
+- All encryption/decryption is performed server-side for maximum security
 
 ## Production Deployment
 

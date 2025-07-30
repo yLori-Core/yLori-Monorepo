@@ -34,7 +34,14 @@ export function QRScannerButton({ eventId }: QRScannerButtonProps) {
       const result = await response.json()
 
       if (result.success) {
-        toast.success(`Successfully checked in ${result.attendeeName}`)
+        // Handle different response types
+        if (result.type === 'info') {
+          // Already checked in case
+          toast.info(result.message || `${result.attendeeName} already checked in`)
+        } else {
+          // Successful first-time check-in
+          toast.success(result.message || `Successfully checked in ${result.attendeeName}`)
+        }
         // Refresh the page to update attendee counts
         window.location.reload()
       } else {

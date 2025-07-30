@@ -3,8 +3,9 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { eventAttendees, events, users } from '@/lib/db/schema'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, or, sql } from 'drizzle-orm'
 import { checkInAttendee } from '@/lib/db/queries'
+import { decryptFromQR } from '@/lib/utils'
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,11 +24,11 @@ export async function POST(request: NextRequest) {
     // The QR data should be encrypted ticket data that contains email and eventId
     let ticketData
     try {
-      // For now, we'll parse the QR data as JSON (this should be encrypted in production)
-      // The TicketQR component generates encrypted data, so we need to decrypt it
-      // This is a simplified version - in production you'd decrypt the data properly
-      ticketData = JSON.parse(qrData)
+      // Decrypt the QR code data first
+      const decryptedData = decryptFromQR(qrData)
+      ticketData = JSON.parse(decryptedData)
     } catch (error) {
+      console.error('Failed to decrypt QR code:', error)
       return NextResponse.json({ success: false, error: 'Invalid QR code format' }, { status: 400 })
     }
 
@@ -40,35 +41,38 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'QR code is for a different event' }, { status: 400 })
     }
 
-    // Find the user by email
-    const userResult = await db.select().from(users).where(eq(users.email, ticketData.email)).limit(1)
-    if (userResult.length === 0) {
-      return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 })
-    }
+    // Find the attendee by either guest email or user email
+    const attendee = await db.query.eventAttendees.findFirst({
+      where: and(
+        eq(eventAttendees.eventId, eventId),
+        or(
+          eq(eventAttendees.guestEmail, ticketData.email),
+          sql`${eventAttendees.userId} IN (SELECT id FROM ${users} WHERE email = ${ticketData.email})`
+        )
+      ),
+      with: {
+        user: true
+      }
+    })
 
-    const user = userResult[0]
-
-    // Find the attendee record
-    const attendeeResult = await db
-      .select()
-      .from(eventAttendees)
-      .where(and(eq(eventAttendees.eventId, eventId), eq(eventAttendees.userId, user.id)))
-      .limit(1)
-
-    if (attendeeResult.length === 0) {
+    if (!attendee) {
       return NextResponse.json({ success: false, error: 'Attendee registration not found' }, { status: 404 })
     }
 
-    const attendee = attendeeResult[0]
-
     // Check if attendee is approved
-    if (attendee.status !== 'approved') {
+    if (attendee.status !== 'approved' && attendee.status !== 'checked_in') {
       return NextResponse.json({ success: false, error: 'Attendee is not approved for this event' }, { status: 400 })
     }
 
     // Check if already checked in
     if (attendee.checkedIn) {
-      return NextResponse.json({ success: false, error: 'Attendee is already checked in' }, { status: 400 })
+      const attendeeName = attendee.user?.name || attendee.guestName || attendee.guestEmail || ticketData.email
+      return NextResponse.json({ 
+        success: true, 
+        attendeeName,
+        message: `${attendeeName} has already checked in`,
+        type: 'info'
+      })
     }
 
     // Verify the organizer has permission to check in attendees for this event
@@ -80,10 +84,12 @@ export async function POST(request: NextRequest) {
     // Check in the attendee
     await checkInAttendee(eventId, attendee.id)
 
+    const attendeeName = attendee.user?.name || attendee.guestName || attendee.guestEmail || ticketData.email
     return NextResponse.json({ 
       success: true, 
-      attendeeName: user.name || user.email,
-      message: 'Attendee checked in successfully' 
+      attendeeName,
+      message: `${attendeeName} successfully checked in`,
+      type: 'success'
     })
 
   } catch (error) {
